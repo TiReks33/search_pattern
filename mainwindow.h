@@ -19,6 +19,10 @@ public:
 
     friend class Search;
 
+    void show_occurrences(std::string const&,char const*);
+
+    QString show_highlighting(const std::string& text,const char*pattern);
+
 private slots:
     void on_pushButton_clicked();
 
@@ -43,6 +47,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Dialog * d_;
+    size_t occurrences;
     //Search * s;
 };
 #endif // MAINWINDOW_H

@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , d_(new Dialog)
     //, s(new Search)
+    , occurrences(0)
 {
     ui->setupUi(this);
     //ui->pushButton->setText("Test Text");
@@ -46,6 +47,135 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete d_;
+}
+
+size_t strlenpp(const std::string *str)
+{
+    const char * str_temp=str->c_str();
+    size_t t = 0;
+    for (; str_temp[t]!='\0';++t);
+    return t;
+
+}
+
+size_t strlenpp(const char *str)
+{
+    size_t t = 0;
+    for (; str[t]!='\0';++t);
+    return t;
+}
+
+
+size_t strlenpp(char *str)
+ {
+     size_t t = 0;
+     for (; str[t]!='\0';++t);
+     return t;
+}
+
+
+// result pattern indexes in text
+void MainWindow::show_occurrences(std::string const & text, char const *pattern)
+{
+
+
+    QString result="";
+
+      size_t start_pos=0;
+      size_t text_find=0;
+      occurrences=0;
+      size_t strlen = strlenpp(pattern);
+
+
+    do    {
+            text_find=text.find(pattern,start_pos);
+
+              if(text_find==std::string::npos){if(occurrences>0)result+="<font color=\"black\">.</font>";break;} // DOT
+              else if(occurrences>0) result+="<font color=\"black\">, </font>";                             // COMMA
+              ++occurrences;
+              result+=QString::number(text_find);
+
+        start_pos=/*result_array()[i]*/text_find+strlen;
+
+            } while(1);
+
+      if(occurrences!=0)result+="<br>";
+      else {
+
+          result+="Entries not found.:(";
+
+          result+="<br>";
+      }
+
+      QString head="<br>Pattern exist in next literal positions(from zero):";
+
+      QString html_final="";
+
+      //QString q_occurrences_of_symbols = "occurrences of bytes (UTF-8 symbols) in file: <font color=\"red\">" + QString::occurrences(occurrences_of_symbols) + "</font>.";
+
+      if(occurrences==0)
+      html_final = "<div><font color=\"red\">"+QString(result)+"</font></div>";
+      else
+      html_final = "<font color=\"green\">"+QString(result)+"</font>";
+
+        //QMessageBox::about(0,"Search results", /*q_occurrences_of_symbols+*/ head+html_final);
+
+      Result * r = new Result;
+
+      r->search_results(html_final);
+
+      r->exec();
+
+}
+
+QString MainWindow::show_highlighting(std::string const & text, char const *pattern)
+{
+    QString before="";
+    QString after="";
+    QString main_string="";
+
+    size_t start_pos=0;
+    size_t text_find=0;
+
+    occurrences=0;
+
+//        for(size_t i=0;i!=(*result_arr_size());++i)
+do    {
+          text_find=text.find(pattern,start_pos);
+//std::cout << "text_find in beginning = " << text_find << "\n";
+//std::cout << start_pos<<"\n";
+            if(text_find==std::string::npos)break;
+            ++occurrences;
+before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
+    before.replace(QString("\n"), QString("<br>"));
+    before.replace(QString(" "), QString("&nbsp;"));
+    before = "<font color=\"black\">"+before+"</font>";
+//std::cout << "start_pos from finale: " <<start_pos<<" ";
+//std::cout << "text_find from finale: " <<text_find<<"\n";
+//++v;
+
+
+after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
+    after.replace(QString("\n"), QString("<br>"));
+    after.replace(QString(" "), QString("&nbsp;"));
+//    after = "<font color=\"red\">"+after+"</font>";
+    //after = "<font color=\"black\">"+after+"</font>";
+    after ="<abc style=\"background-color: orange;\">"+after+"</abc>";
+//++v;
+
+    main_string+=before+after;
+
+start_pos=/*result_array()[i]*/text_find+strlenpp(pattern);
+
+    } while(1);
+//std::cout << "number == " << number<<"\n";
+after=QString::fromStdString(text.substr(start_pos));
+    after.replace(QString("\n"), QString("<br>"));
+    after.replace(QString(" "), QString("&nbsp;"));
+    after = "<font color=\"black\">"+after+"</font>";
+//std::cout << start_pos << "\n";
+    main_string+=after;
+    return main_string;
 }
 
 
@@ -112,11 +242,13 @@ void MainWindow::on_tempButton_clicked()
     ui->pushButton->setStyleSheet("background-color: blue;");
 }
 
+
 void MainWindow::search_slot(QString str)
 {
     ui->textBrowser->setText(str);
     //ui->label->setText(str);
 }
+
 
 void MainWindow::search_slot2(QString pattern,bool highlight)
 {
@@ -126,7 +258,7 @@ void MainWindow::search_slot2(QString pattern,bool highlight)
     //QString text_html = ui->textBrowser->toHtml();
 
 
-    Search ss{};
+    //Search ss{};
 
     std::string str = text.toStdString();
     //char const *cstr=str.c_str();
@@ -138,21 +270,22 @@ void MainWindow::search_slot2(QString pattern,bool highlight)
     //ss.strstr_multi(cstr,pat_cstr);
 
         ui->textBrowser->clear();
-    QString qv = ss.show_finale_qt_test(str,pat_cstr);
+    QString qv = show_highlighting(str,pat_cstr);
     //for(size_t i=0;i!=qv.size();++i)
     ui->textBrowser->insertHtml(qv); // Highlighting
 
     ui->textBrowser->setTextColor("black");
     ui->textBrowser->setAlignment(q);
 
+    ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
+
     if(highlight){
 
-    ss.show_mas_qt_test(str,pat_cstr); // Window with search results
+    show_occurrences(str,pat_cstr); // Window with search results
 
-    }/*else{
-        ui->textBrowser->setTextColor("black");
-    }*/
+    }
 }
+
 
 void MainWindow::highlight_slot()
 {
@@ -163,6 +296,7 @@ void MainWindow::highlight_slot()
 //        ui->textBrowser->setTextColor("black");
 //        ui->textBrowser->setAlignment(q);
 }
+
 
 void MainWindow::search_slot3(QString str)
 {
@@ -186,6 +320,7 @@ void MainWindow::on_tiny_clicked()
     ui->pushButton->setEnabled(true);
     ui->pushButton->setStyleSheet("background-color: blue;");
 }
+
 
 void MainWindow::on_reset_text_clicked()
 {
