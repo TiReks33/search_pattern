@@ -39,19 +39,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="tempButton">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>190</y>
-     <width>88</width>
-     <height>34</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tempButton</string>
-   </property>
-  </widget>
   <widget class="QCheckBox" name="highlight_result">
    <property name="geometry">
     <rect>

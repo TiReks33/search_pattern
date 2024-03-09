@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialog.h"
-#include "qt_search_class.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -11,36 +10,33 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <cstring>
+//#include <cstring>
 #include <fstream>
 #include <string> //for std::getline
 #include <sstream> //std::stringstream
 
-#define RESET   "\033[0m"
-#define BLACK   "\033[30m"      /* Black */
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
+//#define RESET   "\033[0m"
+//#define BLACK   "\033[30m"      /* Black */
+//#define RED     "\033[31m"      /* Red */
+//#define GREEN   "\033[32m"      /* Green */
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , d_(new Dialog)
-    //, s(new Search)
     , occurrences(0)
 {
     ui->setupUi(this);
-    //ui->pushButton->setText("Test Text");
+
        ui->pushButton->setFixedHeight(50);
        ui->pushButton->setFixedWidth(50);
        QRect rect(0,0,50,50);
        QRegion region(rect, QRegion::Ellipse);
        ui->pushButton->setMask(region);
 
-       connect(d_,&Dialog::search_signal, this, &MainWindow::search_slot);
        connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot2);
-       connect(d_,&Dialog::highlight_signal, this, &MainWindow::highlight_slot);
-      // connect(s,&Search::signal,this,&MainWindow::search_slot3);
+
 }
 
 MainWindow::~MainWindow()
@@ -111,14 +107,10 @@ void MainWindow::show_occurrences(std::string const & text, char const *pattern)
 
       QString html_final="";
 
-      //QString q_occurrences_of_symbols = "occurrences of bytes (UTF-8 symbols) in file: <font color=\"red\">" + QString::occurrences(occurrences_of_symbols) + "</font>.";
-
       if(occurrences==0)
       html_final = "<div><font color=\"red\">"+QString(result)+"</font></div>";
       else
       html_final = "<font color=\"green\">"+QString(result)+"</font>";
-
-        //QMessageBox::about(0,"Search results", /*q_occurrences_of_symbols+*/ head+html_final);
 
       Result * r = new Result;
 
@@ -139,7 +131,6 @@ QString MainWindow::show_highlighting(std::string const & text, char const *patt
 
     occurrences=0;
 
-//        for(size_t i=0;i!=(*result_arr_size());++i)
 do    {
           text_find=text.find(pattern,start_pos);
 //std::cout << "text_find in beginning = " << text_find << "\n";
@@ -152,7 +143,7 @@ before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
     before = "<font color=\"black\">"+before+"</font>";
 //std::cout << "start_pos from finale: " <<start_pos<<" ";
 //std::cout << "text_find from finale: " <<text_find<<"\n";
-//++v;
+
 
 
 after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
@@ -161,7 +152,7 @@ after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp
 //    after = "<font color=\"red\">"+after+"</font>";
     //after = "<font color=\"black\">"+after+"</font>";
     after ="<abc style=\"background-color: orange;\">"+after+"</abc>";
-//++v;
+
 
     main_string+=before+after;
 
@@ -210,7 +201,7 @@ void MainWindow::on_actionOpen_triggered()
     //QString file_name = QFileDialog::getOpenFileName(this, "Open a file", "/");
     QString file_name = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
 
-    //QMessageBox::information(this,"..",file_name);
+
 
     QFile file(file_name);
         if(!file.open(QIODevice::ReadOnly))
@@ -243,35 +234,23 @@ void MainWindow::on_tempButton_clicked()
 }
 
 
-void MainWindow::search_slot(QString str)
-{
-    ui->textBrowser->setText(str);
-    //ui->label->setText(str);
-}
-
-
 void MainWindow::search_slot2(QString pattern,bool highlight)
 {
     Qt::Alignment q = ui->textBrowser->alignment();
 
     QString text = ui->textBrowser->toPlainText();
-    //QString text_html = ui->textBrowser->toHtml();
 
-
-    //Search ss{};
 
     std::string str = text.toStdString();
-    //char const *cstr=str.c_str();
+
 
     std::string std_pat = pattern.toStdString();
     char const *pat_cstr = std_pat.c_str();
 
 
-    //ss.strstr_multi(cstr,pat_cstr);
-
         ui->textBrowser->clear();
     QString qv = show_highlighting(str,pat_cstr);
-    //for(size_t i=0;i!=qv.size();++i)
+
     ui->textBrowser->insertHtml(qv); // Highlighting
 
     ui->textBrowser->setTextColor("black");
@@ -285,26 +264,6 @@ void MainWindow::search_slot2(QString pattern,bool highlight)
 
     }
 }
-
-
-void MainWindow::highlight_slot()
-{
-//        ui->textBrowser->clear();
-//        std::vector<QString> qv = ss.show_finale_qt(str,pat_cstr);
-//        for(size_t i=0;i!=qv.size();++i)
-//        ui->textBrowser->insertHtml(qv[i]);
-//        ui->textBrowser->setTextColor("black");
-//        ui->textBrowser->setAlignment(q);
-}
-
-
-void MainWindow::search_slot3(QString str)
-{
-    ui->textBrowser->insertHtml("<div><font color=\"black\">bla-bla-bla</font></div>");
-}
-
-
-
 
 
 void MainWindow::on_tiny_clicked()

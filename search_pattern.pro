@@ -12,13 +12,11 @@ SOURCES += \
     dialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    qt_search_class.cpp \
     result.cpp
 
 HEADERS += \
     dialog.h \
     mainwindow.h \
-    qt_search_class.h \
     result.h
 
 FORMS += \

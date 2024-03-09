@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "dialog.h"
-#include "qt_search_class.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,8 +15,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    friend class Search;
 
     void show_occurrences(std::string const&,char const*);
 
@@ -36,13 +33,13 @@ private slots:
 
 public slots:
 
-    void search_slot(QString str="");
+//    void search_slot(QString str="");
 
     void search_slot2(QString str="",bool highlight=false);
 
-    void search_slot3(QString str="");
+//    void search_slot3(QString str="");
 
-    void highlight_slot();
+//    void highlight_slot();
 
 private:
     Ui::MainWindow *ui;
