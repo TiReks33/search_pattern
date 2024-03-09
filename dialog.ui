@@ -55,14 +55,15 @@
   <widget class="QCheckBox" name="highlight_result">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>200</x>
      <y>190</y>
-     <width>161</width>
-     <height>24</height>
+     <width>181</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>Highlight search result</string>
+    <string>Show pattern occurrences
+ positions</string>
    </property>
    <property name="checked">
     <bool>false</bool>

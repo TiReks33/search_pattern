@@ -306,8 +306,8 @@ temp.push_back(QString::fromStdString(text.substr(start_pos,text_find - start_po
     temp[v].replace(QString("\n"), QString("<br>"));
     temp[v].replace(QString(" "), QString("&nbsp;"));
     temp[v] = "<font color=\"black\">"+temp[v]+"</font>";
-std::cout << "start_pos from finale: " <<start_pos<<" ";
-std::cout << "text_find from finale: " <<text_find<<"\n";
+//std::cout << "start_pos from finale: " <<start_pos<<" ";
+//std::cout << "text_find from finale: " <<text_find<<"\n";
 ++v;
 
 
@@ -357,15 +357,17 @@ before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
     before.replace(QString("\n"), QString("<br>"));
     before.replace(QString(" "), QString("&nbsp;"));
     before = "<font color=\"black\">"+before+"</font>";
-std::cout << "start_pos from finale: " <<start_pos<<" ";
-std::cout << "text_find from finale: " <<text_find<<"\n";
+//std::cout << "start_pos from finale: " <<start_pos<<" ";
+//std::cout << "text_find from finale: " <<text_find<<"\n";
 //++v;
 
 
 after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
     after.replace(QString("\n"), QString("<br>"));
     after.replace(QString(" "), QString("&nbsp;"));
-    after = "<font color=\"red\">"+after+"</font>";
+//    after = "<font color=\"red\">"+after+"</font>";
+    //after = "<font color=\"black\">"+after+"</font>";
+    after ="<abc style=\"background-color: orange;\">"+after+"</abc>";
 //++v;
 
     main_string+=before+after;

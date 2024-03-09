@@ -28,6 +28,8 @@ private slots:
 
     void on_tiny_clicked();
 
+    void on_reset_text_clicked();
+
 public slots:
 
     void search_slot(QString str="");

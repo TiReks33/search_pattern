@@ -92,6 +92,8 @@ void MainWindow::on_actionOpen_triggered()
 
         ui->pushButton->setEnabled(true);
         ui->pushButton->setStyleSheet("background-color: blue;");
+
+        ui->textBrowser->setStyleSheet("");
         }
 }
 
@@ -121,7 +123,7 @@ void MainWindow::search_slot2(QString pattern,bool highlight)
     Qt::Alignment q = ui->textBrowser->alignment();
 
     QString text = ui->textBrowser->toPlainText();
-    QString text_html = ui->textBrowser->toHtml();
+    //QString text_html = ui->textBrowser->toHtml();
 
 
     Search ss{};
@@ -134,18 +136,22 @@ void MainWindow::search_slot2(QString pattern,bool highlight)
 
 
     //ss.strstr_multi(cstr,pat_cstr);
-    if(highlight){
-    ui->textBrowser->clear();
+
+        ui->textBrowser->clear();
     QString qv = ss.show_finale_qt_test(str,pat_cstr);
     //for(size_t i=0;i!=qv.size();++i)
-    ui->textBrowser->insertHtml(qv);
+    ui->textBrowser->insertHtml(qv); // Highlighting
+
     ui->textBrowser->setTextColor("black");
     ui->textBrowser->setAlignment(q);
 
-    ss.show_mas_qt_test(str,pat_cstr);
-    }else{
+    if(highlight){
+
+    ss.show_mas_qt_test(str,pat_cstr); // Window with search results
+
+    }/*else{
         ui->textBrowser->setTextColor("black");
-    }
+    }*/
 }
 
 void MainWindow::highlight_slot()
@@ -179,4 +185,16 @@ void MainWindow::on_tiny_clicked()
 
     ui->pushButton->setEnabled(true);
     ui->pushButton->setStyleSheet("background-color: blue;");
+}
+
+void MainWindow::on_reset_text_clicked()
+{
+
+    QString f = ui->textBrowser->toPlainText();
+    f.replace(QString("\n"), QString("<br>"));
+    f.replace(QString(" "), QString("&nbsp;"));
+    f = "<def style=\"background-color: white;\">"+f+"</def>";
+
+    ui->textBrowser->clear();
+    ui->textBrowser->setHtml(f);
 }
