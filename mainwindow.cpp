@@ -380,6 +380,7 @@ void MainWindow::on_tempButton_clicked()
 
     ui->pushButton->setEnabled(true);
     ui->pushButton->setStyleSheet("background-color: blue;");
+
 }
 
 
@@ -451,6 +452,7 @@ void MainWindow::on_reset_text_clicked()
 
 //    ui->textBrowser->clear();
 //    ui->textBrowser->setHtml(f);
+
 if(!clear_check())
 {
     QString f = mte->toPlainText();
@@ -460,8 +462,11 @@ if(!clear_check())
 
     mte->clear();
     mte->setHtml(f);
+    clear_check()=true;
 }
+
 }
+
 
 void MainWindow::on_actionExit_triggered()
 {
@@ -470,7 +475,11 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::mte_slot()
 {
-    if(!clear_check())
+//    QTextCursor cursor = mte->textCursor();
+
+//    int curpos = cursor.position();
+
+    if(mte->isReadOnly())
     {
         mte->setReadOnly(false);
     QTextCursor cursor = mte->textCursor();
@@ -492,23 +501,40 @@ void MainWindow::mte_slot()
 +mte->toPlainText().replace(QString("\n"), QString("<br>"))
                  .replace(QString(" "), QString("&nbsp;"))+"</def>");
 
+    cursor.clearSelection();
     cursor.setPosition(curpos);
+
 
     mte->setTextCursor(cursor);
 
+    //if(cursor.position()==)
+
     clear_check()=true;
     }
-    //mte->setStyleSheet("");
 
-    //QTextCursor cursor = mte->textCursor();
-    //cursor.clearSelection();
+////    if(!cursor.hasSelection())
+//    cursor.clearSelection();
+//    cursor.setPosition(curpos);
 
-    //mte->setTextCursor(cursor);
+//    mte->setTextCursor(cursor);
 
-    //cursor.setPosition(curpos);
+
+
 }
 
 void MainWindow::select_text_slot()
 {
-    //mte->setReadOnly(true);
+    mte_slot();
+
+
+    QTextCursor cursor = mte->textCursor();
+    if(cursor.hasSelection())
+        ui->statusbar->showMessage("hasselection");
+    else ui->statusbar->showMessage("");
+
+    //    QTextCursor qtc = mte->textCursor();
+    //qtc.clearSelection();
+    //    mte->setTextCursor(qtc);
+
+    //mte->setReadOnly(false);
 }

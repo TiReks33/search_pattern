@@ -26,7 +26,16 @@ public:
 
     QString show_highlighting_edit(const std::string& text,const char*pattern,int color);
 
+
+
+
+
     bool & clear_check(){static bool clear = false;return clear;}
+
+
+
+
+
 
 //    friend class QTextEdit;
 //    void QTextEdit::mouseReleaseEvent(QMouseEvent *e);

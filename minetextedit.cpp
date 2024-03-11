@@ -9,6 +9,13 @@ MineTextEdit::MineTextEdit()
     //ui->setupUi(this);
 }
 
+
+
+//void MineTextEdit::mousePressEvent(QMouseEvent *e)
+//{
+
+//}
+
 void MineTextEdit::mouseReleaseEvent(QMouseEvent *e)
 {
     if(e->button()==Qt::LeftButton)
