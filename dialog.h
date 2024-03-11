@@ -26,7 +26,7 @@ private slots:
 signals:
     void search_signal(QString str="");
 
-    void search_signal2(QString pattern="",bool highlight=false);
+    void search_signal2(QString pattern="",bool highlight=false,int color=0);
 
     void highlight_signal();
 

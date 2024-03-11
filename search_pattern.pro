@@ -12,11 +12,13 @@ SOURCES += \
     dialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    minetextedit.cpp \
     result.cpp
 
 HEADERS += \
     dialog.h \
     mainwindow.h \
+    minetextedit.h \
     result.h
 
 FORMS += \

@@ -25,7 +25,8 @@ void Dialog::on_buttonBox_accepted()
         QMessageBox::warning(this,"Try again", "Pattern of search is empty.");
     else{
 
-        emit search_signal2(str,ui->highlight_result->checkState());
+        emit search_signal2(str,ui->highlight_result->checkState(),
+                            ui->comboBox->currentIndex());
 
         }
 }

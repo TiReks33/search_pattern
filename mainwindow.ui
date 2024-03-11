@@ -42,16 +42,6 @@
      <string>🔍</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>30</y>
-      <width>611</width>
-      <height>751</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="tempButton">
     <property name="geometry">
      <rect>
@@ -65,30 +55,17 @@
      <string>tempButton</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="tiny">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>380</y>
-      <width>80</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>tiny</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="reset_text">
     <property name="geometry">
      <rect>
       <x>700</x>
       <y>320</y>
-      <width>80</width>
+      <width>141</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>reset text</string>
+     <string>Reset search highlight</string>
     </property>
    </widget>
   </widget>
