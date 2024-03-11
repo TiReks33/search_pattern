@@ -32,7 +32,7 @@ public:
 
     bool & clear_check(){static bool clear = false;return clear;}
 
-
+    bool & select_check(){static bool select = false;return select;}
 
 
 
@@ -66,6 +66,8 @@ public slots:
     void mte_slot();
 
     void select_text_slot();
+
+//    void mouse_press_slot();
 
 private:
     Ui::MainWindow *ui;

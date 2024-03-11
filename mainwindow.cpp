@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     layout->addWidget(mte,50,0);
 
-    mte->setReadOnly(true);
+    mte->setReadOnly(false);
 //    mte->insertHtml("<abc style=\"background-color: orange;\">123 456 test</abc>");
 //    mte->insertHtml("<br><abc style=\"background-color: orange;\">yrtyy 456 test</abc>");
 //    mte->insertHtml("<br><abc style=\"background-color: orange;\">dfgdfgfd 456 test</abc>");
@@ -60,8 +60,10 @@ MainWindow::MainWindow(QWidget *parent)
 
    //this->layout()->addWidget(mte);
        connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot2);
+
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
        connect(mte, &MineTextEdit::selectionChanged, this, &MainWindow::select_text_slot);
+       //connect(mte, &MineTextEdit::mouse_press_signal, this, &MainWindow::mouse_press_slot);
 }
 
 MainWindow::~MainWindow()
@@ -360,7 +362,7 @@ void MainWindow::on_actionOpen_triggered()
         mte->setStyleSheet("");
 
 
-
+ui->statusbar->showMessage("Is read only == "+QString::number(mte->isReadOnly()));
         }
 
 }
@@ -381,6 +383,7 @@ void MainWindow::on_tempButton_clicked()
     ui->pushButton->setEnabled(true);
     ui->pushButton->setStyleSheet("background-color: blue;");
 
+    ui->statusbar->showMessage("Is read only == "+QString::number(mte->isReadOnly()));
 }
 
 
@@ -479,9 +482,9 @@ void MainWindow::mte_slot()
 
 //    int curpos = cursor.position();
 
-    if(mte->isReadOnly())
+    if((!mte->isReadOnly())&&(!select_check()))
     {
-        mte->setReadOnly(false);
+        //mte->setReadOnly(false);
     QTextCursor cursor = mte->textCursor();
 
     int curpos = cursor.position();
@@ -501,40 +504,55 @@ void MainWindow::mte_slot()
 +mte->toPlainText().replace(QString("\n"), QString("<br>"))
                  .replace(QString(" "), QString("&nbsp;"))+"</def>");
 
-    cursor.clearSelection();
     cursor.setPosition(curpos);
-
 
     mte->setTextCursor(cursor);
 
-    //if(cursor.position()==)
+    cursor.clearSelection();
 
-    clear_check()=true;
-    }
-
-////    if(!cursor.hasSelection())
-//    cursor.clearSelection();
 //    cursor.setPosition(curpos);
 
 //    mte->setTextCursor(cursor);
 
 
+    select_check()=false;
+    clear_check()=true;
+    }
+
+     if(select_check()){
+        //clear_check()=true;
+        mte->setReadOnly(true);
+        select_check()=false;
+
+
+        }
+
+     mte->setReadOnly(false);
 
 }
+
 
 void MainWindow::select_text_slot()
 {
-    mte_slot();
+    //mte_slot();
 
 
     QTextCursor cursor = mte->textCursor();
-    if(cursor.hasSelection())
-        ui->statusbar->showMessage("hasselection");
-    else ui->statusbar->showMessage("");
+//    if(cursor.hasSelection())
+//        ui->statusbar->showMessage("hasselection");
+//    else ui->statusbar->showMessage("");
 
-    //    QTextCursor qtc = mte->textCursor();
-    //qtc.clearSelection();
-    //    mte->setTextCursor(qtc);
-
-    //mte->setReadOnly(false);
+    //cursor.clearSelection();
+if(!select_check()){
+    //mte->setReadOnly(true);
+select_check()=true;
 }
+//        int curpos = cursor.position();
+
+//        cursor.setPosition(curpos);
+
+//        mte->setTextCursor(cursor);
+
+
+}
+

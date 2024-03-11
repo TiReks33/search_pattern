@@ -11,6 +11,7 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    ui->textEdit->setText("a");
 }
 
 Dialog::~Dialog()

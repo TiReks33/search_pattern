@@ -24,8 +24,8 @@ signals:
 
 void signal();
 
-//private:
-//    Ui::MineTextEdit *ui;
+//void mouse_press_signal();
+
 };
 
 #endif // MINETEXTEDIT_H
