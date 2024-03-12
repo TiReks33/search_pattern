@@ -42,11 +42,13 @@ MainWindow::MainWindow(QWidget *parent)
        QWidget *centralWidget = new QWidget(this);
     centralWidget->setFixedSize(660,660);
     centralWidget->move(0,30);
+//centralWidget->move(0,0);
     QGridLayout *layout = new QGridLayout();
 
     centralWidget->setLayout(layout);
 
     layout->addWidget(mte,50,0);
+//layout->addWidget(mte,0,0);
 
     mte->setReadOnly(false);
 //    mte->insertHtml("<abc style=\"background-color: orange;\">123 456 test</abc>");
@@ -478,18 +480,19 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::mte_slot()
 {
-//    QTextCursor cursor = mte->textCursor();
-
-//    int curpos = cursor.position();
-
-    if((!mte->isReadOnly())&&(!select_check()))
-    {
-        //mte->setReadOnly(false);
     QTextCursor cursor = mte->textCursor();
 
     int curpos = cursor.position();
+    int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
-    ui->statusbar->showMessage(QString::number(curpos));
+    if((mte->isReadOnly())||(!select_check()))
+    {
+        //mte->setReadOnly(false);
+    //QTextCursor cursor = mte->textCursor();
+
+    //int curpos = cursor.position();
+
+
 
     //cursor.setPosition(QTextCursor::LineUnderCursor);
 
@@ -506,7 +509,13 @@ void MainWindow::mte_slot()
 
     cursor.setPosition(curpos);
 
+
+
+    cursor.setPosition(coord2);
     mte->setTextCursor(cursor);
+
+    //mte->setTextCursor(cursor);
+
 
     cursor.clearSelection();
 
@@ -521,14 +530,30 @@ void MainWindow::mte_slot()
 
      if(select_check()){
         //clear_check()=true;
-        mte->setReadOnly(true);
+        //mte->setReadOnly(true);
         select_check()=false;
 
 
         }
 
-     mte->setReadOnly(false);
+     //mte->setReadOnly(false);
 
+     //ui->statusbar->showMessage(QString::number(curpos));
+
+int x = mte->viewport()->mapFromGlobal(mte->cursor().pos()).x();
+int y = mte->viewport()->mapFromGlobal(mte->cursor().pos()).y();
+QPoint xy = mte->viewport()->mapFromGlobal(mte->cursor().pos());
+
+ui->statusbar->showMessage(QString::number(mte->cursorRect().x())+" "+QString::number(mte->cursorRect().y()));
+//mte->cursorForPosition(xy);
+//cursor.setPosition(5);
+
+int coord = mte->cursorForPosition(QCursor::pos()).position();
+//int coord2 = mte->cursorForPosition(QWidget::mapFromGlobal(QCursor::pos())).position();
+//int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+
+//cursor.setPosition(coord2);
+//mte->setTextCursor(cursor);
 }
 
 
