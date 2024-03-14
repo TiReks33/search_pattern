@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QLayout>
+#include <QScrollBar>
 
 #include <iostream>
 #include <stdlib.h>
@@ -100,105 +101,10 @@ size_t strlenpp(char *str)
 }
 
 
-// result pattern indexes in text
-void MainWindow::show_occurrences(std::string const & text, char const *pattern)
-{
-
-
-    QString result="";
-
-      size_t start_pos=0;
-      size_t text_find=0;
-      occurrences=0;
-      size_t strlen = strlenpp(pattern);
-
-
-    do    {
-            text_find=text.find(pattern,start_pos);
-
-              if(text_find==std::string::npos){if(occurrences>0)result+="<font color=\"black\">.</font>";break;} // DOT
-              else if(occurrences>0) result+="<font color=\"black\">, </font>";                             // COMMA
-              ++occurrences;
-              result+=QString::number(text_find);
-
-        start_pos=/*result_array()[i]*/text_find+strlen;
-
-            } while(1);
-
-      if(occurrences!=0)result+="<br>";
-      else {
-
-          result+="Entries not found.:(";
-
-          result+="<br>";
-      }
-
-      QString head="<br>Pattern exist in next literal positions(from zero):";
-
-      QString html_final="";
-
-      if(occurrences==0)
-      html_final = "<div><font color=\"red\">"+QString(result)+"</font></div>";
-      else
-      html_final = "<font color=\"green\">"+QString(result)+"</font>";
-
-      Result * r = new Result;
-
-      r->search_results(html_final);
-
-      r->exec();
-
-}
-
-
-QString MainWindow::show_highlighting(std::string const & text, char const *pattern)
-{
-    QString before="";
-    QString after="";
-    QString main_string="";
-
-    size_t start_pos=0;
-    size_t text_find=0;
-
-    occurrences=0;
-
-do    {
-          text_find=text.find(pattern,start_pos);
-//std::cout << "text_find in beginning = " << text_find << "\n";
-//std::cout << start_pos<<"\n";
-            if(text_find==std::string::npos)break;
-            ++occurrences;
-before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
-    before.replace(QString("\n"), QString("<br>"));
-    before.replace(QString(" "), QString("&nbsp;"));
-    before = "<font color=\"black\">"+before+"</font>";
-//std::cout << "start_pos from finale: " <<start_pos<<" ";
-//std::cout << "text_find from finale: " <<text_find<<"\n";
 
 
 
-after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
-    after.replace(QString("\n"), QString("<br>"));
-    after.replace(QString(" "), QString("&nbsp;"));
-//    after = "<font color=\"red\">"+after+"</font>";
-    //after = "<font color=\"black\">"+after+"</font>";
-    after ="<abc style=\"background-color: orange;\">"+after+"</abc>";
 
-
-    main_string+=before+after;
-
-start_pos=/*result_array()[i]*/text_find+strlenpp(pattern);
-
-    } while(1);
-//std::cout << "number == " << number<<"\n";
-after=QString::fromStdString(text.substr(start_pos));
-    after.replace(QString("\n"), QString("<br>"));
-    after.replace(QString(" "), QString("&nbsp;"));
-    after = "<font color=\"black\">"+after+"</font>";
-//std::cout << start_pos << "\n";
-    main_string+=after;
-    return main_string;
-}
 
 
 // result pattern indexes in text
@@ -271,42 +177,43 @@ QString MainWindow::show_highlighting_edit(std::string const & text, char const 
 
     occurrences=0;
 
+    //"<def style=\"white-space: pre-wrap;\">"+before+"</def>";
+main_string = "<sss style=\"white-space: pre-wrap;\">";
 do    {
           text_find=text.find(pattern,start_pos);
-//std::cout << "text_find in beginning = " << text_find << "\n";
-//std::cout << start_pos<<"\n";
+
             if(text_find==std::string::npos)break;
             ++occurrences;
 before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
     before.replace(QString("\n"), QString("<br>"));
-    before.replace(QString(" "), QString("&nbsp;"));
+    //before.replace(QString(" "), QString("&nbsp;"));
         before = "<font color=\"black\">"+before+"</font>";
-//std::cout << "start_pos from finale: " <<start_pos<<" ";
-//std::cout << "text_find from finale: " <<text_find<<"\n";
+
 
 
 
 after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
     after.replace(QString("\n"), QString("<br>"));
-    after.replace(QString(" "), QString("&nbsp;"));
-    //after = "<font color=\"red\">"+after+"</font>";
-    //after = "<font color=\"black\">"+after+"</font>";
+    //after.replace(QString(" "), QString("&nbsp;"));
+
 
         after ="<abc style=\"background-color:"+color_+";\">"+after+"</abc>";
-        //after.top
+
 
     main_string+=before+after;
 
 start_pos=/*result_array()[i]*/text_find+strlenpp(pattern);
 
     } while(1);
-//std::cout << "number == " << number<<"\n";
+
 after=QString::fromStdString(text.substr(start_pos));
     after.replace(QString("\n"), QString("<br>"));
-    after.replace(QString(" "), QString("&nbsp;"));
+    //after.replace(QString(" "), QString("&nbsp;"));
         after = "<font color=\"black\">"+after+"</font>";
-//std::cout << start_pos << "\n";
-    main_string+=after;
+
+
+
+    main_string+=after+"</sss>";
     return main_string;
 }
 
@@ -354,7 +261,13 @@ void MainWindow::on_actionOpen_triggered()
             //QString abc=in.readAll();//.replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>"));
             //mte->setStyleSheet("");
 
-            mte->setText(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
+            //mte->setText(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
+            mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+in.readAll()
+                         .replace(QString("\n"), QString("<br>"))+"</opf>");
+
+//            mte->setHtml("<op style=\"white-space: pre-wrap;\">"+in.readAll()
+//                         //.replace(QString(" "), QString("&nbsp;"))
+//                         .replace(QString("\n"), QString("<br>"))+"</op>");
 
         //ui->textBrowser->setText(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
 
@@ -380,7 +293,10 @@ void MainWindow::on_tempButton_clicked()
 
     QTextStream in(&file);
 
-    mte->setHtml(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
+    //"<def style=\"white-space: pre-wrap;\">"+before+"</def>";
+    mte->setHtml("<op style=\"white-space: pre-wrap;\">"+in.readAll()
+                 //.replace(QString(" "), QString("&nbsp;"))
+                 .replace(QString("\n"), QString("<br>"))+"</op>");
 
     ui->pushButton->setEnabled(true);
     ui->pushButton->setStyleSheet("background-color: blue;");
@@ -391,11 +307,9 @@ void MainWindow::on_tempButton_clicked()
 
 void MainWindow::search_slot2(QString pattern,bool highlight,int color)
 {
-    //Qt::Alignment q = ui->textBrowser->alignment();
 
-    //QString text = ui->textBrowser->toPlainText();
-
-    QString text = mte->toPlainText();
+    QString text = mte->toPlainText()
+            .replace(QString("\n"), QString("<br>"));
 
     std::string str = text.toStdString();
 
@@ -432,43 +346,22 @@ void MainWindow::search_slot2(QString pattern,bool highlight,int color)
 }
 
 
-//void MainWindow::on_tiny_clicked()
-//{
-//    QFile file("/home/alexander/cpp/small.txt");
-//    if(!file.open(QIODevice::ReadOnly))
-//        QMessageBox::information(0,"info",file.errorString());
-
-//    QTextStream in(&file);
-
-//    ui->textBrowser->setHtml(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
-
-//    ui->pushButton->setEnabled(true);
-//    ui->pushButton->setStyleSheet("background-color: blue;");
-//}
 
 
 void MainWindow::on_reset_text_clicked()
 {
 
-//    QString f = ui->textBrowser->toPlainText();
-//    f.replace(QString("\n"), QString("<br>"));
-//    f.replace(QString(" "), QString("&nbsp;"));
-//    f = "<def style=\"background-color: white;\">"+f+"</def>";
+    if(!clear_check())
+    {
+        QString f = mte->toPlainText();
+        f.replace(QString("\n"), QString("<br>"));
+        //f.replace(QString(" "), QString("&nbsp;"));
+        f = "<def style=\"background-color: white;white-space: pre-wrap;\">"+f+"</def>";
 
-//    ui->textBrowser->clear();
-//    ui->textBrowser->setHtml(f);
-
-if(!clear_check())
-{
-    QString f = mte->toPlainText();
-    f.replace(QString("\n"), QString("<br>"));
-    f.replace(QString(" "), QString("&nbsp;"));
-    f = "<def style=\"background-color: white;\">"+f+"</def>";
-
-    mte->clear();
-    mte->setHtml(f);
-    clear_check()=true;
-}
+        mte->clear();
+        mte->setHtml(f);
+        clear_check()=true;
+    }
 
 }
 
@@ -480,103 +373,60 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::mte_slot()
 {
-    QTextCursor cursor = mte->textCursor();
 
-    int curpos = cursor.position();
+    if(mte->isReadOnly())
+    {
+
+        QTextCursor cursor = mte->textCursor();
+
+        int curpos = cursor.position();
+
+        QScrollBar * scroll = mte->verticalScrollBar();
+            int scrollval = scroll->value();
+            int scrollhor = mte->horizontalScrollBar()->value();
+            scroll->setValue(scrollval);
+
+    mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"
++mte->toPlainText().replace(QString("\n"), QString("<br>"))
+                 //.replace(QString(" "), QString("&nbsp;"))
+                 +"</def>");
+
     int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
-    if((mte->isReadOnly())||(!select_check()))
-    {
-        //mte->setReadOnly(false);
-    //QTextCursor cursor = mte->textCursor();
-
-    //int curpos = cursor.position();
-
-
-
-    //cursor.setPosition(QTextCursor::LineUnderCursor);
-
-    //ui->statusbar->showMessage("signal");
-//    QString f = mte->toPlainText();
-//    f.replace(QString("\n"), QString("<br>"));
-//    f.replace(QString(" "), QString("&nbsp;"));
-//    f = "<def style=\"background-color: white;\">"+f+"</def>";
-//    mte->clear();
-//    mte->setHtml(f);
-    mte->setHtml("<def style=\"background-color: white;\">"
-+mte->toPlainText().replace(QString("\n"), QString("<br>"))
-                 .replace(QString(" "), QString("&nbsp;"))+"</def>");
 
     cursor.setPosition(curpos);
 
+    mte->verticalScrollBar()->setValue(scrollval);
+        mte->horizontalScrollBar()->setValue(scrollhor);
 
+        mte->setTextCursor(cursor);
 
-    cursor.setPosition(coord2);
-    mte->setTextCursor(cursor);
+        cursor.clearSelection();
 
-    //mte->setTextCursor(cursor);
-
-
-    cursor.clearSelection();
-
-//    cursor.setPosition(curpos);
-
-//    mte->setTextCursor(cursor);
-
-
-    select_check()=false;
-    clear_check()=true;
-    }
-
-     if(select_check()){
-        //clear_check()=true;
-        //mte->setReadOnly(true);
-        select_check()=false;
-
-
-        }
-
-     //mte->setReadOnly(false);
-
-     //ui->statusbar->showMessage(QString::number(curpos));
-
-int x = mte->viewport()->mapFromGlobal(mte->cursor().pos()).x();
-int y = mte->viewport()->mapFromGlobal(mte->cursor().pos()).y();
-QPoint xy = mte->viewport()->mapFromGlobal(mte->cursor().pos());
-
-ui->statusbar->showMessage(QString::number(mte->cursorRect().x())+" "+QString::number(mte->cursorRect().y()));
-//mte->cursorForPosition(xy);
-//cursor.setPosition(5);
-
-int coord = mte->cursorForPosition(QCursor::pos()).position();
+//int coord = mte->cursorForPosition(QCursor::pos()).position();
 //int coord2 = mte->cursorForPosition(QWidget::mapFromGlobal(QCursor::pos())).position();
 //int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
-//cursor.setPosition(coord2);
-//mte->setTextCursor(cursor);
+        mte->setReadOnly(false);
+
+    }
+
 }
 
 
 void MainWindow::select_text_slot()
 {
-    //mte_slot();
 
 
-    QTextCursor cursor = mte->textCursor();
-//    if(cursor.hasSelection())
-//        ui->statusbar->showMessage("hasselection");
-//    else ui->statusbar->showMessage("");
+//    QTextCursor cursor = mte->textCursor();
 
-    //cursor.clearSelection();
-if(!select_check()){
-    //mte->setReadOnly(true);
-select_check()=true;
-}
-//        int curpos = cursor.position();
 
-//        cursor.setPosition(curpos);
 
-//        mte->setTextCursor(cursor);
+//if(!select_check()){
+
+//select_check()=true;
+//}
+
 
 
 }

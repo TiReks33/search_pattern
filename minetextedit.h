@@ -16,7 +16,7 @@ class MineTextEdit : public QTextEdit
 public:
     MineTextEdit();
 
-    //void mousePressEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
 
     void mouseReleaseEvent(QMouseEvent *e);
 
