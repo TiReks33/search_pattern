@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QLayout>
 #include <QScrollBar>
+#include <QDebug>
 
 #include <iostream>
 #include <stdlib.h>
@@ -396,6 +397,7 @@ void MainWindow::on_actionExit_triggered()
     QCoreApplication::quit();
 }
 
+
 void MainWindow::mte_slot()
 {
 
@@ -404,7 +406,12 @@ void MainWindow::mte_slot()
 
         QTextCursor cursor = mte->textCursor();
 
-        int curpos = cursor.position();
+        //int curpos = cursor.position();
+        int selection_start = cursor.selectionStart();
+        int selection_end = cursor.selectionEnd();
+
+        qDebug() << "selection start position == " << selection_start << Qt::endl;
+        qDebug() << "selection end position == " << selection_end << Qt::endl;
 
         QScrollBar * scroll = mte->verticalScrollBar();
             int scrollval = scroll->value();
@@ -419,11 +426,13 @@ void MainWindow::mte_slot()
     //int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
 
-    cursor.setPosition(curpos);
+    //cursor.setPosition(curpos);
+    cursor.setPosition(selection_start);
 
     mte->verticalScrollBar()->setValue(scrollval);
         mte->horizontalScrollBar()->setValue(scrollhor);
 
+        cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
         mte->setTextCursor(cursor);
 
         //cursor.clearSelection();
@@ -441,7 +450,9 @@ void MainWindow::mte_slot()
 //            QTextCursor::KeepAnchor);
 //        mte->setTextCursor(c);
 ////!!TEst
-//c.select
+
+        //qDebug() << "selection start position == " << cursor.selectionStart() << Qt::endl;
+        //qDebug() << "selection end position == " << cursor.selectionEnd() << Qt::endl;
     }
 
 }
