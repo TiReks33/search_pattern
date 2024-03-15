@@ -28,6 +28,7 @@ void MineTextEdit::mouseReleaseEvent(QMouseEvent *e)
     {
         emit signal();
     }
+    //QTextEdit::mouseReleaseEvent(e);
 }
 
 

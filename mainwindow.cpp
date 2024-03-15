@@ -33,40 +33,65 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+//"Search button"
        ui->pushButton->setFixedHeight(50);
        ui->pushButton->setFixedWidth(50);
        QRect rect(0,0,50,50);
        QRegion region(rect, QRegion::Ellipse);
        ui->pushButton->setMask(region);
-   //MineTextEdit *mte = new MineTextEdit;
 
+
+//1st widget (main editor window)
        QWidget *centralWidget = new QWidget(this);
     centralWidget->setFixedSize(660,660);
     centralWidget->move(0,30);
-//centralWidget->move(0,0);
-    QGridLayout *layout = new QGridLayout();
 
-    centralWidget->setLayout(layout);
+    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
 
-    layout->addWidget(mte,50,0);
-//layout->addWidget(mte,0,0);
+    //centralWidget->setLayout(layout);
+
+    //layout->addWidget(mte,50,0);
+    layout->addWidget(mte,50);
 
     mte->setReadOnly(false);
-//    mte->insertHtml("<abc style=\"background-color: orange;\">123 456 test</abc>");
-//    mte->insertHtml("<br><abc style=\"background-color: orange;\">yrtyy 456 test</abc>");
-//    mte->insertHtml("<br><abc style=\"background-color: orange;\">dfgdfgfd 456 test</abc>");
-//    mte->insertHtml("<br><abc style=\"background-color: orange;\">xcvnxcvn 456 test</abc>");
 
-    //setCentralWidget(centralWidget);
+//2nd widget (func but)
+    QWidget *buttons_widget = new QWidget(this);
+
+    QVBoxLayout * layout2 = new QVBoxLayout(buttons_widget);
+
+    //    //centralWidget->setLayout(layout2);
+
+    layout2->addWidget(ui->tempButton);
+    ui->tempButton->setFixedWidth(100);
+
+    ui->reset_text->setText("Reset search\nhighlight");
+    layout2->addWidget(ui->reset_text);
+    ui->reset_text->setFixedSize(100,50);
+
+    //layout2->addWidget(ui->pushButton);
+    buttons_widget->setFixedSize(125,125);
+    buttons_widget->move(680,275);
+    buttons_widget->show();
+
+//3d widget (for "search button")
+
+    QWidget *search_widget = new QWidget(this);
+    QGridLayout * layout3 = new QGridLayout(search_widget);
+
+    layout3->addWidget(ui->pushButton);
+
+    search_widget->setFixedSize(175,175);
+    search_widget->move(650,350);
+    search_widget->show();
 
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====SIGNALS=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   //this->layout()->addWidget(mte);
        connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot2);
-
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
-       connect(mte, &MineTextEdit::selectionChanged, this, &MainWindow::select_text_slot);
-       //connect(mte, &MineTextEdit::mouse_press_signal, this, &MainWindow::mouse_press_slot);
+       //connect(mte, &MineTextEdit::selectionChanged, this, &MainWindow::select_text_slot);
+
 }
 
 MainWindow::~MainWindow()
@@ -391,7 +416,7 @@ void MainWindow::mte_slot()
                  //.replace(QString(" "), QString("&nbsp;"))
                  +"</def>");
 
-    int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+    //int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
 
     cursor.setPosition(curpos);
@@ -401,7 +426,7 @@ void MainWindow::mte_slot()
 
         mte->setTextCursor(cursor);
 
-        cursor.clearSelection();
+        //cursor.clearSelection();
 
 //int coord = mte->cursorForPosition(QCursor::pos()).position();
 //int coord2 = mte->cursorForPosition(QWidget::mapFromGlobal(QCursor::pos())).position();
@@ -409,6 +434,14 @@ void MainWindow::mte_slot()
 
         mte->setReadOnly(false);
 
+////!!TEst
+//        QTextCursor c = mte->textCursor();
+//        c.setPosition(5); //startPos
+//        c.setPosition(10, //endPos
+//            QTextCursor::KeepAnchor);
+//        mte->setTextCursor(c);
+////!!TEst
+//c.select
     }
 
 }
