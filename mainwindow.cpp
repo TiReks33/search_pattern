@@ -31,9 +31,9 @@ MainWindow::MainWindow(QWidget *parent)
     , d_(new Dialog)
     , occurrences(0)
     , mte(new MineTextEdit)
+    , buffer_("")
 {
     ui->setupUi(this);
-
 //"Search button"
        ui->pushButton->setFixedHeight(50);
        ui->pushButton->setFixedWidth(50);
@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(mte,50);
 
     mte->setReadOnly(false);
+    //mte->setUndoRedoEnabled(false);
 
 //2nd widget (func but)
     QWidget *buttons_widget = new QWidget(this);
@@ -86,13 +87,29 @@ MainWindow::MainWindow(QWidget *parent)
     search_widget->move(650,350);
     search_widget->show();
 
+    QPushButton *clc_button = new QPushButton(this);
+    clc_button->setText("clear screen");
+    clc_button->setFixedSize(100,50);
+    clc_button->move(700,500);
+    clc_button->show();
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====SIGNALS=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
        connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot2);
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
        //connect(mte, &MineTextEdit::selectionChanged, this, &MainWindow::select_text_slot);
+       connect(clc_button, SIGNAL (released()),this, SLOT (clc_released()));
 
+connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+       //connect(mte->verticalScrollBar(),SIGNAL(sliderPressed(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+       //connect(mte->verticalScrollBar(),SIGNAL(sliderReleased(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+
+       //???connect(mte->verticalScrollBar(),SIGNAL(actionTriggered(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+
+       connect(mte->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int,int)));
+
+//mte->verticalScrollBar()->
 }
 
 MainWindow::~MainWindow()
@@ -284,18 +301,17 @@ void MainWindow::on_actionOpen_triggered()
             mte->clear();
             QTextStream in(&file);
 
-            //QString abc=in.readAll();//.replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>"));
-            //mte->setStyleSheet("");
+            ui->statusbar->showMessage(QString::number(file.size()));
 
-            //mte->setText(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
-            mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+in.readAll()
-                         .replace(QString("\n"), QString("<br>"))+"</opf>");
 
-//            mte->setHtml("<op style=\"white-space: pre-wrap;\">"+in.readAll()
-//                         //.replace(QString(" "), QString("&nbsp;"))
-//                         .replace(QString("\n"), QString("<br>"))+"</op>");
+//            mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+in.readAll()//in.read(4096)
+//                         .replace(QString("\n"), QString("<br>"))+"</opf>");
+             buffer_.clear();
+             buffer_.append("<opf style=\"white-space: pre-wrap;\">"+in.read(4096)
+                                                     .replace(QString("\n"), QString("<br>"))+"</opf>");
 
-        //ui->textBrowser->setText(in.readAll().replace(QString(" "), QString("&nbsp;")).replace(QString("\n"), QString("<br>")));
+             mte->setHtml(buffer_);
+
 
         ui->pushButton->setEnabled(true);
         ui->pushButton->setStyleSheet("background-color: blue;");
@@ -303,7 +319,6 @@ void MainWindow::on_actionOpen_triggered()
         mte->setStyleSheet("");
 
 
-ui->statusbar->showMessage("Is read only == "+QString::number(mte->isReadOnly()));
         }
 
 }
@@ -349,6 +364,7 @@ void MainWindow::search_slot2(QString pattern,bool highlight,int color)
     QString qv = show_highlighting_edit(str,pat_cstr,color);
 
 //    ui->textBrowser->insertHtml(qv); // Highlighting
+
     mte->insertHtml(qv); // Highlighting
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -418,6 +434,10 @@ void MainWindow::mte_slot()
             int scrollhor = mte->horizontalScrollBar()->value();
             scroll->setValue(scrollval);
 
+            qDebug() << "scrollval == " << scrollval << Qt::endl;
+            qDebug() << "scrollhor == " << scrollhor << Qt::endl;
+
+
     mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"
 +mte->toPlainText().replace(QString("\n"), QString("<br>"))
                  //.replace(QString(" "), QString("&nbsp;"))
@@ -454,7 +474,9 @@ void MainWindow::mte_slot()
         //qDebug() << "selection start position == " << cursor.selectionStart() << Qt::endl;
         //qDebug() << "selection end position == " << cursor.selectionEnd() << Qt::endl;
     }
-
+    QTextCursor y=mte->textCursor();
+    int yp=y.position();
+    ui->statusbar->showMessage(QString::number(yp));
 }
 
 
@@ -475,3 +497,23 @@ void MainWindow::select_text_slot()
 
 }
 
+void MainWindow::slider_slot(int v)
+{
+    ui->statusbar->showMessage("simple slider signal == "+QString::number(v));
+}
+
+void MainWindow::slider_slot(int min, int max)
+{
+    ui->statusbar->showMessage("min == "+QString::number(min)+"max == "+QString::number(max));
+}
+
+void MainWindow::clc_released()
+{
+    mte->clear();
+//    delete mte;
+//    mte = new MineTextEdit;
+//    layout->addWidget(mte,50);
+
+//    mte->setReadOnly(false);
+//    mte->setUndoRedoEnabled(false);
+}

@@ -53,6 +53,9 @@ private slots:
 
     void on_actionExit_triggered();
 
+    void clc_released();
+
+
 public slots:
 
 //    void search_slot(QString str="");
@@ -69,11 +72,15 @@ public slots:
 
 //    void mouse_press_slot();
 
+    void slider_slot(int);
+    void slider_slot(int,int);
+
 private:
     Ui::MainWindow *ui;
     Dialog * d_;
     size_t occurrences;
 
     MineTextEdit *mte;
+    QString buffer_;
 };
 #endif // MAINWINDOW_H
