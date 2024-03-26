@@ -19,10 +19,6 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
-//    void on_tempButton_clicked();
-
-//    void on_highlight_result_stateChanged(int arg1);
-
 signals:
     void search_signal(QString str="");
 

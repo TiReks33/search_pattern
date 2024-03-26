@@ -102,9 +102,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====SIGNALS=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-       connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot2);
+       connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot);
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
-       //connect(mte, &MineTextEdit::selectionChanged, this, &MainWindow::select_text_slot);
        connect(clc_button, SIGNAL (released()),this, SLOT (clc_released()));
 
 connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
@@ -165,111 +164,9 @@ size_t strlenpp(char *str)
 
 
 
-
-
-
-
-
 // result pattern indexes in text
-void MainWindow::show_occurrences_edit(std::string const & text, char const *pattern)
-{
 
-    QString result="";
-
-      size_t start_pos=0;
-      size_t text_find=0;
-      occurrences=0;
-      size_t strlen = strlenpp(pattern);
-
-    do    {
-            text_find=text.find(pattern,start_pos);
-
-              if(text_find==std::string::npos){if(occurrences>0)result+=".";break;} // DOT
-              else if(occurrences>0) result+=", ";     // COMMA
-              ++occurrences;
-              result+=QString::number(text_find);
-
-        start_pos=/*result_array()[i]*/text_find+strlen;
-
-            } while(1);
-
-      if(occurrences==0)
-      result+="Entries not found.:(";
-
-
-      Result * r = new Result;
-
-      if(occurrences==0)
-      r->search_results(result,'r');
-      else
-      r->search_results(result);
-
-      r->exec();
-
-}
-
-
-QString MainWindow::show_highlighting_edit(std::string const & text, char const *pattern,int color)
-{
-    QString before="";
-    QString after="";
-    QString main_string="";
-
-    size_t start_pos=0;
-    size_t text_find=0;
-    QString color_="";
-
-           if(!color)    { color_ = "orange";
-    } else if(color == 1){ color_ = "pink";
-    } else if(color == 2){ color_ = "yellow";
-    } else if(color == 3){ color_ = "green";
-    } else if(color == 4){ color_ = "red";
-    }
-
-    occurrences=0;
-
-    //"<def style=\"white-space: pre-wrap;\">"+before+"</def>";
-main_string = "<sss style=\"white-space: pre-wrap;\">";
-do    {
-          text_find=text.find(pattern,start_pos);
-
-            if(text_find==std::string::npos)break;
-            ++occurrences;
-before=QString::fromStdString(text.substr(start_pos,text_find - start_pos));
-    before.replace(QString("\n"), QString("<br>"));
-    //before.replace(QString(" "), QString("&nbsp;"));
-        before = "<font color=\"black\">"+before+"</font>";
-
-
-
-
-after=QString::fromStdString(text.substr(/*result_array()[i]*/text_find,strlenpp(pattern)));
-    after.replace(QString("\n"), QString("<br>"));
-    //after.replace(QString(" "), QString("&nbsp;"));
-
-
-        after ="<abc style=\"background-color:"+color_+";\">"+after+"</abc>";
-
-
-    main_string+=before+after;
-
-start_pos=/*result_array()[i]*/text_find+strlenpp(pattern);
-
-    } while(1);
-
-after=QString::fromStdString(text.substr(start_pos));
-    after.replace(QString("\n"), QString("<br>"));
-    //after.replace(QString(" "), QString("&nbsp;"));
-        after = "<font color=\"black\">"+after+"</font>";
-
-
-
-    main_string+=after+"</sss>";
-    return main_string;
-}
-
-
-void MainWindow::show_highlighting_edit2(std::string const & text, char const *pattern,int color)
+void MainWindow::search_highlight(std::string const & text, char const *pattern,int color)
 {
     std::string before="";
     std::string after="";
@@ -326,7 +223,7 @@ after=text.substr(start_pos);
 }
 
 
-void MainWindow::show_highlighting_edit3(std::string const & text, char const *pattern,int color)
+void MainWindow::search_highlight_occurrences(std::string const & text, char const *pattern,int color)
 {
 
     std::string before="";
@@ -503,80 +400,10 @@ void MainWindow::on_tempButton_clicked()
 }
 
 
-//void MainWindow::search_slot2(QString pattern,bool highlight,int color)
-//{
-
-//    QString text = buffer_;//mte->toPlainText()
-//            //.replace(QString("\n"), QString("<br>"));
-
-//    std::string str = text.toStdString();
-
-
-//    std::string std_pat = pattern.toStdString();
-//    char const *pat_cstr = std_pat.c_str();
-
-
-//    //SCROLLBAR->
-
-
-//        int scrollval = mte->verticalScrollBar()->value();
-//        //int scrollhor = mte->horizontalScrollBar()->value();
-//        QScrollBar scroll;scroll.setValue(scrollval);
-
-
-//    //SCROLLBAR<-
-
-
-//        //ui->textBrowser->clear();
-//        mte->clear();
-//    //QString qv = show_highlighting_edit(str,pat_cstr,color);
-//                                                            //        search_ = show_highlighting_edit(str,pat_cstr,color);
-//                 //text = show_highlighting_edit2(str,pat_cstr,color);
-//        if(!highlight){
-//            show_highlighting_edit2(str,pat_cstr,color);
-//        }else{
-//            show_highlighting_edit3(str,pat_cstr,color);
-//        }
-////        //    ui->textBrowser->insertHtml(qv); // Highlighting
-//    //mte->insertHtml(qv); // Highlighting
-
-////mte->insertHtml(text);
-
-
-//        //SCROLLBAR->
-
-
-//        mte->verticalScrollBar()->setValue(scrollval);
-//            //mte->horizontalScrollBar()->setValue(scrollhor);
-
-
-//        //SCROLLBAR<-
-
-
-//    //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//    clear_check()=false;
-//    mte->setReadOnly(true);
-//    //%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-////    ui->textBrowser->setTextColor("black");
-
-//    mte->setTextColor("black");
-
-////    //ui->textBrowser->setAlignment(q);
-
-//    ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
-
-////    if(highlight){
-
-////    show_occurrences_edit(str,pat_cstr); // Window with search results
-
-////    }
-//}
 
 
 
-
-void MainWindow::search_slot2(QString pattern,bool highlight,int color)
+void MainWindow::search_slot(QString pattern,bool highlight,int color)
 {
 
     QFile file(temp_file_path_ + temp_file_name_);
@@ -621,13 +448,13 @@ void MainWindow::search_slot2(QString pattern,bool highlight,int color)
 
         //ui->textBrowser->clear();
         mte->clear();
-    //QString qv = show_highlighting_edit(str,pat_cstr,color);
-                                                            //        search_ = show_highlighting_edit(str,pat_cstr,color);
-                 //text = show_highlighting_edit2(str,pat_cstr,color);
+    //QString qv = search_highlight(str,pat_cstr,color);
+                                                            //        search_ = search_highlight(str,pat_cstr,color);
+                 //text = search_highlight(str,pat_cstr,color);
         if(!highlight){
-            show_highlighting_edit2(str,pat_cstr,color);
+            search_highlight(str,pat_cstr,color);
         }else{
-            show_highlighting_edit3(str,pat_cstr,color);
+            search_highlight_occurrences(str,pat_cstr,color);
         }
 //        //    ui->textBrowser->insertHtml(qv); // Highlighting
     //mte->insertHtml(qv); // Highlighting
@@ -813,22 +640,6 @@ void MainWindow::mte_slot()
 }
 
 
-void MainWindow::select_text_slot()
-{
-
-
-//    QTextCursor cursor = mte->textCursor();
-
-
-
-//if(!select_check()){
-
-//select_check()=true;
-//}
-
-
-
-}
 
 void MainWindow::slider_slot(int v)
 {
@@ -842,13 +653,7 @@ void MainWindow::slider_slot(int min, int max)
 
 void MainWindow::clc_released()
 {
-    //mte->clear();
+
     mte->clear();
 
-//    delete mte;
-//    mte = new MineTextEdit;
-//    layout->addWidget(mte,50);
-
-//    mte->setReadOnly(false);
-//    mte->setUndoRedoEnabled(false);
 }

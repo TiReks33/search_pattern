@@ -21,6 +21,7 @@ void MineTextEdit::mousePressEvent(QMouseEvent *e)
 }
 
 
+
 void MineTextEdit::mouseReleaseEvent(QMouseEvent *e)
 {
     QTextEdit::mouseReleaseEvent(e);
@@ -32,9 +33,3 @@ void MineTextEdit::mouseReleaseEvent(QMouseEvent *e)
 }
 
 
-//Dialog::Dialog(QWidget *parent) :
-//    QDialog(parent),
-//    ui(new Ui::Dialog)
-//{
-//    ui->setupUi(this);
-//}

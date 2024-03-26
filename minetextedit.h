@@ -6,9 +6,7 @@
 #include <QWidget>
 #include <QTextBrowser>
 
-//namespace Ui {
-//class MineTextEdit;
-//}
+
 
 class MineTextEdit : public QTextEdit
 {
@@ -30,8 +28,4 @@ void signal();
 
 #endif // MINETEXTEDIT_H
 
-//MainWindow::MainWindow(QWidget *parent)
-//    : QMainWindow(parent)
 
-//    friend class QTextEdit;
-//    void QTextEdit::mouseReleaseEvent(QMouseEvent *e);
