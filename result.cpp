@@ -14,7 +14,13 @@ Result::~Result()
     delete ui;
 }
 
-void Result::search_results(QString text)
+void Result::search_results(QString& text)
 {
-    ui->result_text->setHtml(text);
+    ui->result_text->setPlainText(text);
+}
+
+void Result::search_results(QString& text, char /*color*/)
+{
+    //"<div><font color=\"red\">"+QString(result)+"</font></div>";
+    ui->result_text->setHtml("<div><font color=\"red\">"+text+"</font></div>");
 }

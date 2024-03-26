@@ -11,6 +11,9 @@
 #include <QLayout>
 #include <QScrollBar>
 #include <QDebug>
+#include <QCloseEvent>
+#include <QString>
+#include <QFileInfo>
 
 #include <iostream>
 #include <stdlib.h>
@@ -18,6 +21,7 @@
 #include <fstream>
 #include <string> //for std::getline
 #include <sstream> //std::stringstream
+//#include <cerrno>
 
 //#define RESET   "\033[0m"
 //#define BLACK   "\033[30m"      /* Black */
@@ -32,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     , occurrences(0)
     , mte(new MineTextEdit)
     , buffer_("")
+    , in_()
+    , temp_file_path_(QDir::homePath())
+    , temp_file_name_("/$temp1")
 {
     ui->setupUi(this);
 //"Search button"
@@ -110,6 +117,10 @@ connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalSc
        connect(mte->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int,int)));
 
 //mte->verticalScrollBar()->
+       mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+
+mte->setFont(QFont("DejaVu Sans Mono"));
 }
 
 MainWindow::~MainWindow()
@@ -117,6 +128,15 @@ MainWindow::~MainWindow()
     delete ui;
     delete d_;
     delete mte;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox p;
+    p.warning(0,"123","123");
+    //p.exec();
+    //cleanUp();
+           event->accept();
 }
 
 size_t strlenpp(const std::string *str)
@@ -154,7 +174,6 @@ size_t strlenpp(char *str)
 void MainWindow::show_occurrences_edit(std::string const & text, char const *pattern)
 {
 
-
     QString result="";
 
       size_t start_pos=0;
@@ -162,12 +181,11 @@ void MainWindow::show_occurrences_edit(std::string const & text, char const *pat
       occurrences=0;
       size_t strlen = strlenpp(pattern);
 
-
     do    {
             text_find=text.find(pattern,start_pos);
 
-              if(text_find==std::string::npos){if(occurrences>0)result+="<font color=\"black\">.</font>";break;} // DOT
-              else if(occurrences>0) result+="<font color=\"black\">, </font>";                             // COMMA
+              if(text_find==std::string::npos){if(occurrences>0)result+=".";break;} // DOT
+              else if(occurrences>0) result+=", ";     // COMMA
               ++occurrences;
               result+=QString::number(text_find);
 
@@ -175,26 +193,16 @@ void MainWindow::show_occurrences_edit(std::string const & text, char const *pat
 
             } while(1);
 
-      if(occurrences!=0)result+="<br>";
-      else {
-
-          result+="Entries not found.:(";
-
-          result+="<br>";
-      }
-
-      QString head="<br>Pattern exist in next literal positions(from zero):";
-
-      QString html_final="";
-
       if(occurrences==0)
-      html_final = "<div><font color=\"red\">"+QString(result)+"</font></div>";
-      else
-      html_final = "<font color=\"green\">"+QString(result)+"</font>";
+      result+="Entries not found.:(";
+
 
       Result * r = new Result;
 
-      r->search_results(html_final);
+      if(occurrences==0)
+      r->search_results(result,'r');
+      else
+      r->search_results(result);
 
       r->exec();
 
@@ -211,7 +219,7 @@ QString MainWindow::show_highlighting_edit(std::string const & text, char const 
     size_t text_find=0;
     QString color_="";
 
-    if(!color){ color_ = "orange";
+           if(!color)    { color_ = "orange";
     } else if(color == 1){ color_ = "pink";
     } else if(color == 2){ color_ = "yellow";
     } else if(color == 3){ color_ = "green";
@@ -261,35 +269,175 @@ after=QString::fromStdString(text.substr(start_pos));
 }
 
 
+void MainWindow::show_highlighting_edit2(std::string const & text, char const *pattern,int color)
+{
+    std::string before="";
+    std::string after="";
+    QString main_string="";
+
+    size_t start_pos=0;
+    size_t text_find=0;
+    QString color_="";
+
+    size_t strlen = strlenpp(pattern);
+
+           if(!color)    { color_ = "orange";
+    } else if(color == 1){ color_ = "pink";
+    } else if(color == 2){ color_ = "yellow";
+    } else if(color == 3){ color_ = "green";
+    } else if(color == 4){ color_ = "red";
+    }
+
+    occurrences=0;
+
+main_string = "<sss style=\"white-space: pre-wrap;\">";
+
+  do{
+          text_find=text.find(pattern,start_pos);
+
+            if (text_find==std::string::npos) break;
+
+            ++occurrences;
+
+before=text.substr(start_pos,text_find - start_pos);
+
+
+after=text.substr(text_find,strlen);
+
+
+    main_string+=QString::fromStdString(before).replace(QString("\n"), QString("<br>"))
+
+                +"<abc style=\"background-color:"+color_+";\">"
+
+                +QString::fromStdString(after).replace(QString("\n"), QString("<br>"))+"</abc>";
+
+start_pos=text_find+strlen;
+
+    } while(1);
+
+after=text.substr(start_pos);
+
+
+    main_string+=QString::fromStdString(after).replace(QString("\n"), QString("<br>"))+"</sss>";
+    //return main_string;
+
+    buffer_=main_string;
+    mte->insertHtml(buffer_);
+}
+
+
+void MainWindow::show_highlighting_edit3(std::string const & text, char const *pattern,int color)
+{
+
+    std::string before="";
+    std::string after="";
+    QString main_string="";
+    QString result="";
+
+    size_t start_pos=0;
+    size_t text_find=0;
+    QString color_="";
+
+    size_t strlen = strlenpp(pattern);
+
+           if(!color)    { color_ = "orange";
+    } else if(color == 1){ color_ = "pink";
+    } else if(color == 2){ color_ = "yellow";
+    } else if(color == 3){ color_ = "green";
+    } else if(color == 4){ color_ = "red";
+    }
+
+    occurrences=0;
+
+main_string = "<sss style=\"white-space: pre-wrap;\">";
+
+  do{
+          text_find=text.find(pattern,start_pos);
+
+            if (text_find==std::string::npos) {if(occurrences>0)result+=".";break;} // DOT
+            else if(occurrences>0) result+=", ";     // COMMA
+            ++occurrences;
+            result+=QString::number(text_find);
+
+before=text.substr(start_pos,text_find - start_pos);
+
+
+after=text.substr(text_find,strlen);
+
+
+    main_string+=QString::fromStdString(before).replace(QString("\n"), QString("<br>"))
+
+                +"<abc style=\"background-color:"+color_+";\">"
+
+                +QString::fromStdString(after).replace(QString("\n"), QString("<br>"))
+
+                +"</abc>";
+
+start_pos=text_find+strlen;
+
+    } while(1);
+
+if(occurrences==0)
+result+="Entries not found.:(";
+
+after=text.substr(start_pos);
+
+
+    main_string+=QString::fromStdString(after).replace(QString("\n"), QString("<br>"))+"</sss>";
+
+    Result r{};
+
+     if(occurrences==0)
+     r.search_results(result,'r');
+     else
+     r.search_results(result);
+
+    //return main_string;
+     buffer_=main_string;
+     mte->insertHtml(buffer_);
+
+    r.exec();
+}
+
+
+
 void MainWindow::on_pushButton_clicked()
 {
-    //QDialog * d = new Dialog;
-    //if(!d_)d_ = new Dialog;
-    d_->setModal(true);
+    //QString file_dir = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
+        //QFile file("/home/alexander/cpp/$temp1");
+          QFile file(temp_file_path_ + temp_file_name_);
+
+        if(!file.open(QIODevice::WriteOnly)){
+
+            QMessageBox p;
+                    p.warning(0,"Error","Temporary data save error. "
+            "Please, close search window if you don't want to lose your current changes.");
+                    qDebug() << "ERROR READING FILE:" << file.fileName();
+
+        }else{
+        QTextStream stream(&file);
+
+        stream << mte->toPlainText();
+
+        file.close();
+
+
+//    {
+//        qDebug() << "ERROR READING FILE";
+//    }
+
+    }
+        d_->setModal(true);
     d_->show();
 
-    //Dialog * d = new Dialog;
-    //d->setModal(true);
-//connect(d,SIGNAL(search_signal()), this, SLOT(search_slot()));
-    //d.show();
-
     d_->exec();
+        //}
 }
+
 
 void MainWindow::on_actionOpen_triggered()
 {
-    //## 1 file
-//    QFile file("/home/alexander/qtcreator_proj/search_pattern/test789.txt");
-//    if(!file.open(QIODevice::ReadOnly))
-//        QMessageBox::information(0,"info",file.errorString());
 
-//    QTextStream in(&file);
-
-//    ui->textBrowser->setText(in.readAll());
-
-    //##ALL files dialog
-
-    //QString file_name = QFileDialog::getOpenFileName(this, "Open a file", "/");
     QString file_name = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
 
 
@@ -301,17 +449,26 @@ void MainWindow::on_actionOpen_triggered()
             mte->clear();
             QTextStream in(&file);
 
-            ui->statusbar->showMessage(QString::number(file.size()));
+            temp_file_path_=QFileInfo(file).path();
 
 
-//            mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+in.readAll()//in.read(4096)
-//                         .replace(QString("\n"), QString("<br>"))+"</opf>");
-             buffer_.clear();
-             buffer_.append("<opf style=\"white-space: pre-wrap;\">"+in.read(4096)
-                                                     .replace(QString("\n"), QString("<br>"))+"</opf>");
+            ui->statusbar->showMessage("File path: "+temp_file_path_+' '+"File Size: "+QString::number(file.size()));
 
-             mte->setHtml(buffer_);
+            buffer_.clear();
 
+            while(!in.atEnd()) {
+                buffer_.append(in.read(500000));
+            }
+//                  buffer_.append(in.readAll());
+            file.close();
+
+
+
+
+
+             mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
+                                                                  +"</opf>");
+             //mte->setPlainText(buffer_);
 
         ui->pushButton->setEnabled(true);
         ui->pushButton->setStyleSheet("background-color: blue;");
@@ -346,26 +503,150 @@ void MainWindow::on_tempButton_clicked()
 }
 
 
+//void MainWindow::search_slot2(QString pattern,bool highlight,int color)
+//{
+
+//    QString text = buffer_;//mte->toPlainText()
+//            //.replace(QString("\n"), QString("<br>"));
+
+//    std::string str = text.toStdString();
+
+
+//    std::string std_pat = pattern.toStdString();
+//    char const *pat_cstr = std_pat.c_str();
+
+
+//    //SCROLLBAR->
+
+
+//        int scrollval = mte->verticalScrollBar()->value();
+//        //int scrollhor = mte->horizontalScrollBar()->value();
+//        QScrollBar scroll;scroll.setValue(scrollval);
+
+
+//    //SCROLLBAR<-
+
+
+//        //ui->textBrowser->clear();
+//        mte->clear();
+//    //QString qv = show_highlighting_edit(str,pat_cstr,color);
+//                                                            //        search_ = show_highlighting_edit(str,pat_cstr,color);
+//                 //text = show_highlighting_edit2(str,pat_cstr,color);
+//        if(!highlight){
+//            show_highlighting_edit2(str,pat_cstr,color);
+//        }else{
+//            show_highlighting_edit3(str,pat_cstr,color);
+//        }
+////        //    ui->textBrowser->insertHtml(qv); // Highlighting
+//    //mte->insertHtml(qv); // Highlighting
+
+////mte->insertHtml(text);
+
+
+//        //SCROLLBAR->
+
+
+//        mte->verticalScrollBar()->setValue(scrollval);
+//            //mte->horizontalScrollBar()->setValue(scrollhor);
+
+
+//        //SCROLLBAR<-
+
+
+//    //%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//    clear_check()=false;
+//    mte->setReadOnly(true);
+//    //%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+////    ui->textBrowser->setTextColor("black");
+
+//    mte->setTextColor("black");
+
+////    //ui->textBrowser->setAlignment(q);
+
+//    ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
+
+////    if(highlight){
+
+////    show_occurrences_edit(str,pat_cstr); // Window with search results
+
+////    }
+//}
+
+
+
+
 void MainWindow::search_slot2(QString pattern,bool highlight,int color)
 {
 
-    QString text = mte->toPlainText()
-            .replace(QString("\n"), QString("<br>"));
+    QFile file(temp_file_path_ + temp_file_name_);
 
-    std::string str = text.toStdString();
+  if(!file.open(QIODevice::ReadOnly)){
+
+      QMessageBox p;
+              p.warning(0,"Error","Temporary data read error. "
+      "...");
+              qDebug() << "ERROR READING FILE:" << file.fileName();
+
+  }else{
+  QTextStream stream(&file);
+  buffer_.clear();
+
+  buffer_.append(stream.readAll());
+
+
+  file.close();
+
+
+
+
+
+    std::string str = buffer_.toStdString();
 
 
     std::string std_pat = pattern.toStdString();
     char const *pat_cstr = std_pat.c_str();
 
 
+    //SCROLLBAR->
+
+
+        int scrollval = mte->verticalScrollBar()->value();
+        //int scrollhor = mte->horizontalScrollBar()->value();
+        QScrollBar scroll;scroll.setValue(scrollval);
+
+
+    //SCROLLBAR<-
+
+
         //ui->textBrowser->clear();
         mte->clear();
-    QString qv = show_highlighting_edit(str,pat_cstr,color);
+    //QString qv = show_highlighting_edit(str,pat_cstr,color);
+                                                            //        search_ = show_highlighting_edit(str,pat_cstr,color);
+                 //text = show_highlighting_edit2(str,pat_cstr,color);
+        if(!highlight){
+            show_highlighting_edit2(str,pat_cstr,color);
+        }else{
+            show_highlighting_edit3(str,pat_cstr,color);
+        }
+//        //    ui->textBrowser->insertHtml(qv); // Highlighting
+    //mte->insertHtml(qv); // Highlighting
+//buffer_.clear();
+//buffer_.append(QString::fromStdString(str));
+//mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
+//                                                     +"</opf>");
+//mte->insertHtml(text);
 
-//    ui->textBrowser->insertHtml(qv); // Highlighting
 
-    mte->insertHtml(qv); // Highlighting
+        //SCROLLBAR->
+
+
+        mte->verticalScrollBar()->setValue(scrollval);
+            //mte->horizontalScrollBar()->setValue(scrollhor);
+
+
+        //SCROLLBAR<-
+
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%
     clear_check()=false;
@@ -380,12 +661,17 @@ void MainWindow::search_slot2(QString pattern,bool highlight,int color)
 
     ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
 
-    if(highlight){
+//    if(highlight){
 
-    show_occurrences_edit(str,pat_cstr); // Window with search results
+//    show_occurrences_edit(str,pat_cstr); // Window with search results
 
-    }
+//    }
+  }
 }
+
+
+
+
 
 
 
@@ -410,7 +696,8 @@ void MainWindow::on_reset_text_clicked()
 
 void MainWindow::on_actionExit_triggered()
 {
-    QCoreApplication::quit();
+    //QCoreApplication::quit();
+   close();
 }
 
 
@@ -438,10 +725,56 @@ void MainWindow::mte_slot()
             qDebug() << "scrollhor == " << scrollhor << Qt::endl;
 
 
-    mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"
-+mte->toPlainText().replace(QString("\n"), QString("<br>"))
-                 //.replace(QString(" "), QString("&nbsp;"))
-                 +"</def>");
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+
+
+
+
+//buffer_.clear();
+//buffer_=mte->toPlainText();
+//mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"+buffer_+"</def>");
+////mte->setStyleSheet("background-color: white");
+
+            QFile file(temp_file_path_ + temp_file_name_);
+
+          if(!file.open(QIODevice::ReadOnly)){
+
+              QMessageBox p;
+                      p.warning(0,"Error","Temporary data read error. "
+              "...");
+                      qDebug() << "ERROR READING FILE:" << file.fileName();
+
+          }else{
+          QTextStream stream(&file);
+          buffer_.clear();
+
+          buffer_.append(stream.readAll());
+
+
+          file.close();
+
+          mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"+buffer_+"</def>");
+
+      }
+
+
+
+
+
+
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+//mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"
+//            +buffer_
+//             +"</def>");
+
+
 
     //int coord2 = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
@@ -450,11 +783,11 @@ void MainWindow::mte_slot()
     cursor.setPosition(selection_start);
 
     mte->verticalScrollBar()->setValue(scrollval);
-        mte->horizontalScrollBar()->setValue(scrollhor);
+        //mte->horizontalScrollBar()->setValue(scrollhor);
 
         cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
-        mte->setTextCursor(cursor);
 
+        mte->setTextCursor(cursor);
         //cursor.clearSelection();
 
 //int coord = mte->cursorForPosition(QCursor::pos()).position();
@@ -504,12 +837,14 @@ void MainWindow::slider_slot(int v)
 
 void MainWindow::slider_slot(int min, int max)
 {
-    ui->statusbar->showMessage("min == "+QString::number(min)+"max == "+QString::number(max));
+    //ui->statusbar->showMessage("min == "+QString::number(min)+"max == "+QString::number(max));
 }
 
 void MainWindow::clc_released()
 {
+    //mte->clear();
     mte->clear();
+
 //    delete mte;
 //    mte = new MineTextEdit;
 //    layout->addWidget(mte,50);

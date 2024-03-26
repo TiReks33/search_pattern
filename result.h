@@ -15,7 +15,9 @@ public:
     explicit Result(QWidget *parent = nullptr);
     ~Result();
 
-    void search_results(QString);
+    void search_results(QString&);
+
+    void search_results(QString&,char);
 
 private:
     Ui::Result *ui;

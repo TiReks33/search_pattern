@@ -5,6 +5,7 @@
 #include "dialog.h"
 #include <QTextEdit>
 #include "minetextedit.h"
+#include <QTextStream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +19,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void closeEvent(QCloseEvent *event);
+
     void show_occurrences(std::string const&,char const*);
 
     QString show_highlighting(const std::string& text,const char*pattern);
@@ -25,6 +28,10 @@ public:
     void show_occurrences_edit(std::string const&,char const*);
 
     QString show_highlighting_edit(const std::string& text,const char*pattern,int color);
+
+    void show_highlighting_edit2(const std::string& text,const char*pattern,int color);
+
+    void show_highlighting_edit3(const std::string& text,const char*pattern,int color);
 
 
 
@@ -82,5 +89,9 @@ private:
 
     MineTextEdit *mte;
     QString buffer_;
+    QTextStream in_;
+    QString temp_file_path_;
+    QString temp_file_name_;
+    //QString search_;
 };
 #endif // MAINWINDOW_H
