@@ -50,6 +50,10 @@ private slots:
     void clc_released();
 
 
+    void on_bigRead_button_clicked();
+
+    void on_search_clc_button_clicked();
+
 public slots:
 
     void search_slot(QString str="",bool highlight=false,int color=0);
@@ -80,6 +84,7 @@ private:
     size_t scroll_buf;
     size_t buf_start;
     bool end_file;
+    //bool is_split;
 
 };
 #endif // MAINWINDOW_H

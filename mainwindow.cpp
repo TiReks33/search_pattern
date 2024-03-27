@@ -39,6 +39,20 @@ MainWindow::MainWindow(QWidget *parent)
     , in_()
     , temp_file_path_(QDir::homePath())
     , temp_file_name_("/$temp1")
+
+    //// text file partial read logic
+    , fsize_(0)
+    , maxfullsize(500000)
+    , buf_size   (500000)
+//    , maxfullsize(25000000)
+//    , buf_size(250000)
+    , scroll_buf(0)
+
+    , buf_start(0)
+    //, buf_end(0)
+
+    , end_file(false)
+    //, is_split(false)
 {
     ui->setupUi(this);
 //"Search button"
@@ -106,8 +120,8 @@ MainWindow::MainWindow(QWidget *parent)
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
        connect(clc_button, SIGNAL (released()),this, SLOT (clc_released()));
 
-connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
-connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+//connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
+//connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
        //connect(mte->verticalScrollBar(),SIGNAL(sliderPressed(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
        //connect(mte->verticalScrollBar(),SIGNAL(sliderReleased(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
 
@@ -118,6 +132,8 @@ connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalSc
 //mte->verticalScrollBar()->
        mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
+       connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
+       connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
 
 mte->setFont(QFont("DejaVu Sans Mono"));
 }
@@ -202,11 +218,17 @@ before=text.substr(start_pos,text_find - start_pos);
 after=text.substr(text_find,strlen);
 
 
-    main_string+=QString::fromStdString(before).replace(QString("\n"), QString("<br>"))
+    main_string+=QString::fromStdString(before)
+
+//                .replace(QString("\n"), QString("<br>"))
 
                 +"<abc style=\"background-color:"+color_+";\">"
 
-                +QString::fromStdString(after).replace(QString("\n"), QString("<br>"))+"</abc>";
+                +QString::fromStdString(after)
+
+//                .replace(QString("\n"), QString("<br>"))
+
+                +"</abc>";
 
 start_pos=text_find+strlen;
 
@@ -215,11 +237,20 @@ start_pos=text_find+strlen;
 after=text.substr(start_pos);
 
 
-    main_string+=QString::fromStdString(after).replace(QString("\n"), QString("<br>"))+"</sss>";
+    main_string+=QString::fromStdString(after)
+
+//                .replace(QString("\n"), QString("<br>"))
+
+                +"</sss>";
+
     //return main_string;
 
-    buffer_=main_string;
-    mte->insertHtml(buffer_);
+    buffer_.clear();
+    //buffer_=main_string;
+    buffer_.append(main_string);
+    //mte->insertHtml(buffer_);
+
+
 }
 
 
@@ -290,10 +321,14 @@ after=text.substr(start_pos);
      r.search_results(result);
 
     //return main_string;
-     buffer_=main_string;
-     mte->insertHtml(buffer_);
+     buffer_.clear();
+     //buffer_=main_string;
+     buffer_.append(main_string);
+     //mte->insertHtml(buffer_);
 
     r.exec();
+
+
 }
 
 
@@ -345,6 +380,7 @@ void MainWindow::on_actionOpen_triggered()
         else{
             mte->clear();
             QTextStream in(&file);
+            //fsize_=file.size();
 
             temp_file_path_=QFileInfo(file).path();
 
@@ -353,14 +389,15 @@ void MainWindow::on_actionOpen_triggered()
 
             buffer_.clear();
 
-            while(!in.atEnd()) {
-                buffer_.append(in.read(500000));
-            }
+//            while(!in.atEnd()) {
+//                buffer_.append(in.read(500000));
+//            }
+            buffer_.append(in.readAll());
 //                  buffer_.append(in.readAll());
             file.close();
 
 
-
+end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
 
              mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
@@ -416,8 +453,14 @@ void MainWindow::search_slot(QString pattern,bool highlight,int color)
               qDebug() << "ERROR READING FILE:" << file.fileName();
 
   }else{
+      ui->search_clc_button->setEnabled(true);
+      on_search_clc_button_clicked();
+
   QTextStream stream(&file);
+  fsize_=file.size();
+
   buffer_.clear();
+  //mte->clear();
 
   buffer_.append(stream.readAll());
 
@@ -435,65 +478,68 @@ void MainWindow::search_slot(QString pattern,bool highlight,int color)
     char const *pat_cstr = std_pat.c_str();
 
 
-    //SCROLLBAR->
 
 
-        int scrollval = mte->verticalScrollBar()->value();
-        //int scrollhor = mte->horizontalScrollBar()->value();
-        QScrollBar scroll;scroll.setValue(scrollval);
 
+//        int scrollval = mte->verticalScrollBar()->value();
+//        QScrollBar scroll;scroll.setValue(scrollval);
+//        mte->clear();
 
-    //SCROLLBAR<-
-
-
-        //ui->textBrowser->clear();
-        mte->clear();
-    //QString qv = search_highlight(str,pat_cstr,color);
-                                                            //        search_ = search_highlight(str,pat_cstr,color);
-                 //text = search_highlight(str,pat_cstr,color);
         if(!highlight){
             search_highlight(str,pat_cstr,color);
         }else{
             search_highlight_occurrences(str,pat_cstr,color);
         }
-//        //    ui->textBrowser->insertHtml(qv); // Highlighting
-    //mte->insertHtml(qv); // Highlighting
-//buffer_.clear();
-//buffer_.append(QString::fromStdString(str));
-//mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
-//                                                     +"</opf>");
-//mte->insertHtml(text);
+auto bfs = buffer_.size();
+fsize_=bfs;
 
-
-        //SCROLLBAR->
-
-
+        if(fsize_<maxfullsize){
+            int scrollval = mte->verticalScrollBar()->value();
+            QScrollBar scroll;scroll.setValue(scrollval);
+            mte->clear();
+        mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
+//                     .replace(QString("\n"), QString("<br>"))
+                     +"</opf>");
         mte->verticalScrollBar()->setValue(scrollval);
-            //mte->horizontalScrollBar()->setValue(scrollhor);
+         end_file=true;
+
+        }else if(fsize_>=maxfullsize){
+
+            //is_split=true;
+        mte->clear();
+        //buffer for "split-scroll" viewing
+             if(fsize_<2500000)                 buf_size= 250000;
+        else if(fsize_>2500000&&fsize_<5500000) buf_size= 500000;
+        else if(fsize_>5500000&&fsize_<10000000)buf_size= 750000;
+        else if(fsize_>10000000)                buf_size= 1000000;
+
+             QStringRef subbuf(&buffer_,buf_start,buf_size);
+             mte->insertHtml("<opf style=\"white-space: pre-wrap;\">"+subbuf.toString()
+                                      /*.replace(QString("\n"), QString("<br>"))*/
+                                      +"</opf>");
+             buf_start+= buf_size;
+             //buf_end = buf_start + buf_size;
+             size_t max_scroll = mte->verticalScrollBar()->maximum();
+             scroll_buf=(max_scroll*0.75);
+
+             //end_file=false; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+        }
 
 
-        //SCROLLBAR<-
+//    mte->verticalScrollBar()->setValue(scrollval);
 
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%
     clear_check()=false;
-    mte->setReadOnly(true);
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-//    ui->textBrowser->setTextColor("black");
+    mte->setReadOnly(true);
 
     mte->setTextColor("black");
 
-//    //ui->textBrowser->setAlignment(q);
-
     ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
 
-//    if(highlight){
-
-//    show_occurrences_edit(str,pat_cstr); // Window with search results
-
-//    }
+    ui->statusbar->showMessage("FILE SIZE IS ::"+QString::number(fsize_)+"BUFFER AFTER SEARCH SIZE IS ::"+QString::number(bfs));
   }
+
 }
 
 
@@ -533,6 +579,10 @@ void MainWindow::mte_slot()
 
     if(mte->isReadOnly())
     {
+
+end_file=true;
+
+        //is_split=false;
 
         QTextCursor cursor = mte->textCursor();
 
@@ -641,9 +691,52 @@ void MainWindow::mte_slot()
 
 
 
-void MainWindow::slider_slot(int v)
+void MainWindow::slider_slot(int)//(int v)
 {
-    ui->statusbar->showMessage("simple slider signal == "+QString::number(v));
+    //ui->statusbar->showMessage("simple slider signal == "+QString::number(v));
+
+       //end_file=true;
+       // qDebug()<<"BUFFER SIZE ==" << buf_size;
+        size_t temp = mte->verticalScrollBar()->value();
+        //qDebug()<< "MAXIMUM ==" << ui->textEdit->verticalScrollBar()->maximum();
+    //    size_t max_scroll = ui->textEdit->verticalScrollBar()->maximum();
+    //    scroll_buf=(max_scroll*0.75);
+        //ui->statusbar->showMessage(QString::number(ui->textEdit->verticalScrollBar()->value()));
+        ui->statusbar->showMessage(QString::number(temp));
+        if(end_file){ return;}
+        if (temp>=(scroll_buf))
+        {
+            //ui->textEdit->verticalScrollBar()->setEnabled(false);
+
+            if(buf_start+buf_size<=fsize_){
+            QStringRef subbuf(&buffer_,buf_start,buf_size);
+            mte->insertHtml("<opf style=\"white-space: pre-wrap;\">"+subbuf.toString()/*.replace(QString("\n"), QString("<br>"))*/+"</opf>");
+            buf_start+= buf_size;
+        //end_file=true;
+            size_t max_scroll = mte->verticalScrollBar()->maximum();
+             scroll_buf=(max_scroll*0.75);
+
+             //ui->textEdit->verticalScrollBar()->setEnabled(true);
+
+            } else if((buf_start+buf_size)>fsize_){
+                size_t buf_final_temp = fsize_-buf_start;
+                QStringRef subbuf(&buffer_,buf_start,buf_final_temp);
+                mte->insertHtml("<opf style=\"white-space: pre-wrap;\">"+subbuf.toString()/*.replace(QString("\n"), QString("<br>"))*/+"</opf>");
+                end_file=true;
+
+                //%%%%%%%%%%%%%%%%
+                scroll_buf=0;
+                buf_start=0;
+                //%%%%%%%%%%%%%%%%
+
+                //is_split=false;
+
+            }
+            //scroll_buf*=2;
+        }
+
+
+
 }
 
 //void MainWindow::slider_slot(int min, int max)
@@ -656,4 +749,44 @@ void MainWindow::clc_released()
 
     mte->clear();
 
+}
+
+void MainWindow::on_bigRead_button_clicked()
+{
+    if(end_file) return;
+    else
+    if(fsize_<maxfullsize) return;
+
+    else if (fsize_>=maxfullsize)
+    {
+        /*if(end_file){return;
+        } else */if(buf_start+buf_size<=fsize_){
+        QStringRef subbuf(&buffer_,buf_start,buf_size);
+        mte->insertHtml("<opf style=\"white-space: pre-wrap;\">"+subbuf.toString()/*.replace(QString("\n"), QString("<br>"))*/+"</opf>");
+        buf_start+= buf_size;
+
+        size_t max_scroll = mte->verticalScrollBar()->maximum();
+        scroll_buf=(max_scroll*0.75);
+        } else if((buf_start+buf_size)>fsize_){
+            size_t buf_final_temp = fsize_-buf_start;
+            QStringRef subbuf(&buffer_,buf_start,buf_final_temp);
+            mte->insertHtml("<opf style=\"white-space: pre-wrap;\">"+subbuf.toString()/*.replace(QString("\n"), QString("<br>"))*/+"</opf>");
+            end_file=true;
+            //%%%%%%%%%%%%%%%%
+            scroll_buf=0;
+            buf_start=0;
+            //%%%%%%%%%%%%%%%%
+        }
+    }
+}
+
+void MainWindow::on_search_clc_button_clicked()
+{
+    mte->clear();
+    buffer_.clear();
+    end_file=false;
+    //%%%%%%%%%%%%%%%%
+    scroll_buf=0;
+    buf_start=0;
+    //%%%%%%%%%%%%%%%%
 }
