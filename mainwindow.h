@@ -58,7 +58,7 @@ public slots:
 
     void slider_slot(int);
 
-    void slider_slot(int,int);
+    //void slider_slot(int,int);
 
 private:
     Ui::MainWindow *ui;
@@ -71,6 +71,15 @@ private:
     QString temp_file_path_;
     QString temp_file_name_;
     //QString search_;
+
+    // text file partial read logic
+    // (by slider (vertical scroll-bar)
+    size_t fsize_;
+    size_t maxfullsize;
+    size_t buf_size;
+    size_t scroll_buf;
+    size_t buf_start;
+    bool end_file;
 
 };
 #endif // MAINWINDOW_H

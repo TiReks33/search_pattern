@@ -113,7 +113,7 @@ connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalSc
 
        //???connect(mte->verticalScrollBar(),SIGNAL(actionTriggered(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)));
 
-       connect(mte->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int,int)));
+       //connect(mte->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int,int)));
 
 //mte->verticalScrollBar()->
        mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -646,10 +646,10 @@ void MainWindow::slider_slot(int v)
     ui->statusbar->showMessage("simple slider signal == "+QString::number(v));
 }
 
-void MainWindow::slider_slot(int min, int max)
-{
-    //ui->statusbar->showMessage("min == "+QString::number(min)+"max == "+QString::number(max));
-}
+//void MainWindow::slider_slot(int min, int max)
+//{
+//    //ui->statusbar->showMessage("min == "+QString::number(min)+"max == "+QString::number(max));
+//}
 
 void MainWindow::clc_released()
 {
