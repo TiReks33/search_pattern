@@ -62,6 +62,10 @@ public slots:
 
     void slider_slot(int);
 
+    void format_slot(const QTextCharFormat &f);
+
+    void mouse_press_slot();
+
     //void slider_slot(int,int);
 
 private:
@@ -85,6 +89,7 @@ private:
     size_t buf_start;
     bool end_file;
     //bool is_split;
+    QTextCharFormat format;
 
 };
 #endif // MAINWINDOW_H

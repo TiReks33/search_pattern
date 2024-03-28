@@ -22,7 +22,7 @@ signals:
 
 void signal();
 
-//void mouse_press_signal();
+void mouse_press_signal();
 
 };
 

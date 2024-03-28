@@ -14,6 +14,8 @@
 #include <QCloseEvent>
 #include <QString>
 #include <QFileInfo>
+//#include <QPalette>
+//#include <QTextCharFormat>
 
 #include <iostream>
 #include <stdlib.h>
@@ -135,6 +137,10 @@ MainWindow::MainWindow(QWidget *parent)
        connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
        connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
 
+       connect(mte,&MineTextEdit::currentCharFormatChanged,this,&MainWindow::format_slot);
+
+       connect(mte,&MineTextEdit::mouse_press_signal,this,&MainWindow::mouse_press_slot);
+
 mte->setFont(QFont("DejaVu Sans Mono"));
 }
 
@@ -203,7 +209,7 @@ void MainWindow::search_highlight(std::string const & text, char const *pattern,
 
     occurrences=0;
 
-main_string = "<sss style=\"white-space: pre-wrap;\">";
+main_string = "<sss style=\"white-space: pre-wrap;background-color:white;\">";
 
   do{
           text_find=text.find(pattern,start_pos);
@@ -241,11 +247,13 @@ after=text.substr(start_pos);
 
 //                .replace(QString("\n"), QString("<br>"))
 
-                +"</sss>";
+                +"</sss>"+"<redd style=\"background-color:red;\">"+"</redd>";
 
     //return main_string;
 
     buffer_.clear();
+    mte->clearMask();
+
     //buffer_=main_string;
     buffer_.append(main_string);
     //mte->insertHtml(buffer_);
@@ -399,6 +407,11 @@ void MainWindow::on_actionOpen_triggered()
 
 end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
+//            QTextCharFormat tcf;
+//            QColor qc;
+//            qc.fromRgba()
+//            tcf.setBackground();
+//            mte->setCurrentCharFormat()
 
              mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
                                                                   +"</opf>");
@@ -407,9 +420,9 @@ end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         ui->pushButton->setEnabled(true);
         ui->pushButton->setStyleSheet("background-color: blue;");
 
-        mte->setStyleSheet("");
+        //mte->setStyleSheet("");
 
-
+        format=mte->currentCharFormat();
         }
 
 }
@@ -533,11 +546,14 @@ fsize_=bfs;
 
     mte->setReadOnly(true);
 
-    mte->setTextColor("black");
+    //mte->setTextColor("black");
 
     ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
 
-    ui->statusbar->showMessage("FILE SIZE IS ::"+QString::number(fsize_)+"BUFFER AFTER SEARCH SIZE IS ::"+QString::number(bfs));
+    ui->statusbar->showMessage("FILE SIZE IS ::"+QString::number(fsize_)
+                               +"BUFFER AFTER SEARCH SIZE IS ::"+QString::number(bfs));
+    qDebug() << "FORMAT AFTER OPEN ::" << format.background();
+
   }
 
 }
@@ -587,11 +603,12 @@ end_file=true;
         QTextCursor cursor = mte->textCursor();
 
         //int curpos = cursor.position();
-        int selection_start = cursor.selectionStart();
-        int selection_end = cursor.selectionEnd();
+        //int selection_start = cursor.selectionStart();
 
-        qDebug() << "selection start position == " << selection_start << Qt::endl;
-        qDebug() << "selection end position == " << selection_end << Qt::endl;
+        //int selection_end = cursor.selectionEnd();
+
+        //qDebug() << "selection start position == " << selection_start << Qt::endl;
+        //qDebug() << "selection end position == " << selection_end << Qt::endl;
 
         QScrollBar * scroll = mte->verticalScrollBar();
             int scrollval = scroll->value();
@@ -632,7 +649,9 @@ end_file=true;
 
           file.close();
 
-          mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"+buffer_+"</def>");
+          //mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"+buffer_+"</def>");
+
+          mte->setPlainText(buffer_);
 
       }
 
@@ -657,14 +676,20 @@ end_file=true;
 
 
     //cursor.setPosition(curpos);
-    cursor.setPosition(selection_start);
+//    cursor.setPosition(selection_start);
 
-    mte->verticalScrollBar()->setValue(scrollval);
+//mte->verticalScrollBar()->setValue(scrollval);
         //mte->horizontalScrollBar()->setValue(scrollhor);
 
-        cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
+//        cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
 
-        mte->setTextCursor(cursor);
+//mte->setTextCursor(cursor);
+
+
+
+
+
+
         //cursor.clearSelection();
 
 //int coord = mte->cursorForPosition(QCursor::pos()).position();
@@ -684,9 +709,9 @@ end_file=true;
         //qDebug() << "selection start position == " << cursor.selectionStart() << Qt::endl;
         //qDebug() << "selection end position == " << cursor.selectionEnd() << Qt::endl;
     }
-    QTextCursor y=mte->textCursor();
+    /*QTextCursor y=mte->textCursor();
     int yp=y.position();
-    ui->statusbar->showMessage(QString::number(yp));
+    ui->statusbar->showMessage(QString::number(yp))*/;
 }
 
 
@@ -737,6 +762,16 @@ void MainWindow::slider_slot(int)//(int v)
 
 
 
+}
+
+void MainWindow::format_slot(const QTextCharFormat &f)
+{
+    qDebug() << "Current format changed: " << f.background();
+}
+
+void MainWindow::mouse_press_slot()
+{
+    mte->setCurrentCharFormat(format);
 }
 
 //void MainWindow::slider_slot(int min, int max)
