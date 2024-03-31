@@ -37,11 +37,9 @@ public:
 
 
 private slots:
-    void on_pushButton_clicked();
+    void on_search_button_clicked();
 
     void on_actionOpen_triggered();
-
-    void on_tempButton_clicked();
 
     void on_reset_text_clicked();
 
@@ -66,7 +64,13 @@ public slots:
 
     void mouse_press_slot();
 
+    void add_text_slot(size_t,size_t);
+
     //void slider_slot(int,int);
+
+signals:
+
+    void add_text_signal(size_t,size_t);
 
 private:
     Ui::MainWindow *ui;
@@ -76,12 +80,22 @@ private:
     MineTextEdit *mte;
     QString buffer_;
     QTextStream in_;
+
+    size_t first_occurrence_;
+
+    QString prog_name_;
+    QString file_path_;
+    QString file_name_;
     QString temp_file_path_;
-    QString temp_file_name_;
+    QString temp_file_prefix_;
+    QString temp_subfolder_;
+    QString full_tmp_f_path_;
+
     //QString search_;
 
     // text file partial read logic
     // (by slider (vertical scroll-bar)
+    size_t plain_fsize_;
     size_t fsize_;
     size_t maxfullsize;
     size_t buf_size;
@@ -91,5 +105,6 @@ private:
     //bool is_split;
     QTextCharFormat format;
 
+    int cursor_position;
 };
 #endif // MAINWINDOW_H

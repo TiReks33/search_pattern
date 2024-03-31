@@ -14,7 +14,7 @@
    <string>Pattern search</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="search_button">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -40,22 +40,6 @@
     </property>
     <property name="text">
      <string>🔍</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="tempButton">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>260</y>
-      <width>88</width>
-      <height>34</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RTおはよう1UptempButton</string>
     </property>
    </widget>
    <widget class="QPushButton" name="reset_text">
@@ -101,6 +85,32 @@
     </property>
     <property name="text">
      <string>clc (search)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>140</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>210</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
     </property>
    </widget>
   </widget>
