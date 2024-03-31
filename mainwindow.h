@@ -66,11 +66,27 @@ public slots:
 
     void add_text_slot(size_t,size_t);
 
+    void set_position_slot(size_t);
+
+    void set_cursor_slot(int);
+
+    void set_cursor_slot(size_t);
+
+    void set_cursor_slot(QTextCursor);
+
     //void slider_slot(int,int);
 
 signals:
 
     void add_text_signal(size_t,size_t);
+
+    void set_position_signal(size_t);
+
+    void set_cursor_signal(int);
+
+    void set_cursor_signal(size_t);
+
+    void set_cursor_signal(QTextCursor);
 
 private:
     Ui::MainWindow *ui;

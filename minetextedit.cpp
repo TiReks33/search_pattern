@@ -24,12 +24,12 @@ void MineTextEdit::mousePressEvent(QMouseEvent *e)
 
 void MineTextEdit::mouseReleaseEvent(QMouseEvent *e)
 {
-    //QTextEdit::mouseReleaseEvent(e);
+    QTextEdit::mouseReleaseEvent(e);
     if(e->button()==Qt::LeftButton)
     {
         emit signal();
     }
-    QTextEdit::mouseReleaseEvent(e);
+    //QTextEdit::mouseReleaseEvent(e);
 }
 
 

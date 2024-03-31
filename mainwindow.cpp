@@ -137,6 +137,12 @@ MainWindow::MainWindow(QWidget *parent)
 
        connect(this,&MainWindow::add_text_signal,this,&MainWindow::add_text_slot,Qt::QueuedConnection);
 
+       connect(this,&MainWindow::set_position_signal,this,&MainWindow::set_position_slot,Qt::QueuedConnection);
+
+       connect(this,SIGNAL(set_cursor_signal(int)),this,SLOT(set_cursor_slot(int)),Qt::QueuedConnection);
+
+       connect(this,SIGNAL(set_cursor_signal(QTextCursor)),this,SLOT(set_cursor_slot(QTextCursor)),Qt::QueuedConnection);
+
 mte->setFont(QFont("DejaVu Sans Mono"));
 }
 
@@ -624,32 +630,19 @@ void MainWindow::mte_slot()
 
 end_file=true;
 
-int scrollval = mte->verticalScrollBar()->value();
+size_t scrollval = mte->verticalScrollBar()->value();
 
 QElapsedTimer t;
  t.start();
 
-        QTextCursor cursor = mte->textCursor();
-        cursor.setCharFormat(format);
+       // QTextCursor cursor = mte->textCursor();
+       // cursor.setCharFormat(format);
 
-//        int curpos = cursor.position();
-        int selection_start = cursor.selectionStart();
+        //int positio = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
 
-        int selection_end = cursor.selectionEnd();
+      //  int selection_start = cursor.selectionStart();
 
-       // qDebug() << "selection start position == " << selection_start << Qt::endl;
-       // qDebug() << "selection end position == " << selection_end << Qt::endl;
-        //
-
-        //QScrollBar * scroll = mte->verticalScrollBar();
-            //int scrollval = mte->verticalScrollBar()->value();
-            //int scrollhor = mte->horizontalScrollBar()->value();
-            //mte->verticalScrollBar()->setValue(scrollval);
-            //scroll->setValue(scrollval);
-          //  qDebug() << "scrollval == " << scrollval << Qt::endl;
-         //   qDebug() << "scrollhor == " << scrollhor << Qt::endl;
-
-
+      //  int selection_end = cursor.selectionEnd();
 
 
 
@@ -666,6 +659,12 @@ QElapsedTimer t;
 
           }else{
 
+          //positio = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+         // qDebug() << "POSITION == " << positio;
+          //mte->setReadOnly(false);
+
+
+
           QTextStream stream(&file);
           buffer_.clear();
 
@@ -676,27 +675,39 @@ QElapsedTimer t;
           file.close();
 
           //mte->setHtml("<def style=\"background-color: white;white-space: pre-wrap;\">"+buffer_+"</def>");
-
-          mte->setPlainText(buffer_);
-
+mte->clear();
+          mte->insertPlainText(buffer_);
+          //mte->setPlainText(buffer_);
+//QTextCursor kkk = mte->textCursor();
+//kkk.setPosition(positio);
+//mte->setTextCursor(kkk);
+//mte->verticalScrollBar()->setSliderPosition(scrollval);
       }
 
 
-         cursor.setPosition(selection_start);
+       //  cursor.setPosition(selection_start);
 
 
 
-        cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
+       // cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
 
-        mte->setTextCursor(cursor);
+        //mte->setTextCursor(cursor);
 
-        mte->verticalScrollBar()->setSliderPosition(scrollval);
+//mte->setReadOnly(false);
+          emit set_position_signal(scrollval);
+          //emit set_cursor_signal(scrollval);
 
+
+
+        //mte->verticalScrollBar()->setSliderPosition(scrollval);
+
+
+        //emit set_cursor_signal(cursor);
 
 
         //mte->setVerticalScrollBar(scroll);
+mte->setReadOnly(false);
 
-          mte->setReadOnly(false);
 
 
 qDebug() << "MTE time == " << t.elapsed();
@@ -711,6 +722,7 @@ qDebug() << "MTE time == " << t.elapsed();
 //    mte->setTextCursor(cccurs);
 
 //    mte->verticalScrollBar()->setValue(2000);
+
 }
 
 
@@ -778,13 +790,13 @@ void MainWindow::mouse_press_slot()
     mte->setCurrentCharFormat(format);
 }
 
-void MainWindow::add_text_slot(size_t cur, size_t max)
+void MainWindow::add_text_slot(size_t slider_cur_pos, size_t max_slider_buffer )
 {
     qDebug() << "ADD TEXT SIGNAL EMITTED";
     if(end_file) return;
     else
-    if(fsize_<maxfullsize) return;
-    else if(cur>max)
+    if(fsize_<maxfullsize) return;                                                 // fsize_ OR plain_fsize_?????????????
+    else if(slider_cur_pos>max_slider_buffer )
     {
         do{
         QStringRef subbuf(&buffer_,buf_start,buf_size);
@@ -797,11 +809,41 @@ void MainWindow::add_text_slot(size_t cur, size_t max)
 
         buf_start+= buf_size;
 
-        max = mte->verticalScrollBar()->maximum();
-        scroll_buf=(max*0.75);
-        }while(cur>max);
+        max_slider_buffer = mte->verticalScrollBar()->maximum();
+        scroll_buf=(max_slider_buffer *0.75);
+        }while(slider_cur_pos>max_slider_buffer );
     }
-    mte->verticalScrollBar()->setSliderPosition(cur);
+    mte->verticalScrollBar()->setSliderPosition(slider_cur_pos);
+}
+
+
+void MainWindow::set_position_slot(size_t scrollval)
+{
+    qDebug() << "SIGNAL SET POSITION EMITED";
+    mte->verticalScrollBar()->setSliderPosition(scrollval);
+}
+
+void MainWindow::set_cursor_slot(int positio)
+{
+    QTextCursor cursor = mte->textCursor();
+    //cursor.setPosition(mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position());
+    cursor.setPosition(positio);
+    mte->setTextCursor(cursor);
+    qDebug() << "SIGNAL CURSOR EMITED";
+}
+
+void MainWindow::set_cursor_slot(size_t positio)
+{
+    QTextCursor cursor = mte->textCursor();
+    //cursor.setPosition(mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position());
+    cursor.setPosition(positio);
+    mte->setTextCursor(cursor);
+    qDebug() << "SIGNAL CURSOR EMITED";
+}
+
+void MainWindow::set_cursor_slot(QTextCursor cursor)
+{
+    mte->setTextCursor(cursor);
 }
 
 
