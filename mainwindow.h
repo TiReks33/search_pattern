@@ -70,9 +70,9 @@ public slots:
 
     void set_cursor_slot(int);
 
-    void set_cursor_slot(size_t);
+    //void set_cursor_slot(size_t);
 
-    void set_cursor_slot(QTextCursor);
+    //void set_cursor_slot(QTextCursor);
 
     //void slider_slot(int,int);
 
@@ -84,9 +84,9 @@ signals:
 
     void set_cursor_signal(int);
 
-    void set_cursor_signal(size_t);
+    //void set_cursor_signal(size_t);
 
-    void set_cursor_signal(QTextCursor);
+    //void set_cursor_signal(QTextCursor);
 
 private:
     Ui::MainWindow *ui;
