@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent)
     //, is_split(false)
 
     , format(mte->currentCharFormat())
+
+    , ProcessIsFinished(false)
 {
     ui->setupUi(this);
 //"Search button"
@@ -142,9 +144,14 @@ MainWindow::MainWindow(QWidget *parent)
 
        connect(this,SIGNAL(set_cursor_signal(int)),this,SLOT(set_cursor_slot(int)),Qt::QueuedConnection);
 
+       //connect(mte,&MineTextEdit::textChanged,this,&MainWindow::wait_slot);
+       connect(this,&MainWindow::long_text_add_signal, this, &MainWindow::long_text_add_slot);
+       connect(this,SIGNAL(cursor_shape_signal(int)),this,SLOT(cursor_shape_slot(int)));
+
        //connect(this,SIGNAL(set_cursor_signal(QTextCursor)),this,SLOT(set_cursor_slot(QTextCursor)),Qt::QueuedConnection);
 
 mte->setFont(QFont("DejaVu Sans Mono"));
+//this->mte->setUndoRedoEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -420,7 +427,9 @@ qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::
 
             buffer_.clear();
 
-            buffer_.append(in.readAll());
+            while (!in.atEnd())
+                buffer_.append(in.read(256));
+            //buffer_.append(in.readAll());
 
             file.close();
 
@@ -430,7 +439,31 @@ end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
 //             mte->setHtml("<opf style=\"white-space: pre-wrap;\">"+buffer_
 //                                                                  +"</opf>");
-             mte->setPlainText(buffer_);
+
+
+
+
+if(plain_fsize_<maxfullsize){
+
+ end_file=true;
+
+}else if(plain_fsize_>=maxfullsize){
+
+     if(plain_fsize_<2500000)                 { buf_size= 250000 ; }
+else if(plain_fsize_>2500000&&plain_fsize_<5500000) { buf_size= 500000 ; }
+else if(plain_fsize_>5500000&&plain_fsize_<10000000){ buf_size= 750000 ; }
+else if(plain_fsize_>10000000)                { buf_size= 1000000; }
+else {;}
+
+
+
+                //QCursor wait = Qt::WaitCursor;
+                this->setCursor(Qt::WaitCursor);
+                //emit cursor_shape_signal(2);
+                emit long_text_add_signal();
+                //while(!ProcessIsFinished);
+        //emit cursor_shape_signal(0);
+                //mte->setPlainText(buffer_);
 
              // search_button "activate" trigger
         ui->search_button->setEnabled(true);
@@ -440,6 +473,8 @@ end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
         format=mte->currentCharFormat();
         }
+
+    }
 
 }
 
@@ -533,8 +568,8 @@ size_t position_ = mte->verticalScrollBar()->value();
         mte->clear();
         //buffer for "split-scroll" viewing
              if(fsize_<2500000)                 { buf_size= 250000 ; }
-        else if(fsize_>2500000&&plain_fsize_<5500000) { buf_size= 500000 ; }
-        else if(fsize_>5500000&&plain_fsize_<10000000){ buf_size= 750000 ; }
+        else if(fsize_>2500000&&fsize_<5500000) { buf_size= 500000 ; }
+        else if(fsize_>5500000&&fsize_<10000000){ buf_size= 750000 ; }
         else if(fsize_>10000000)                { buf_size= 1000000; }
         else {;}
 
@@ -820,7 +855,11 @@ void MainWindow::add_text_slot(size_t slider_cur_pos, size_t max_slider_buffer )
     if(fsize_<maxfullsize) return;                                                 // fsize_ OR plain_fsize_?????????????
     else if(slider_cur_pos>max_slider_buffer )
     {
+
         do{
+
+            if((buf_start+buf_size)<=fsize_){
+
         QStringRef subbuf(&buffer_,buf_start,buf_size);
 
         mte->insertHtml(
@@ -833,9 +872,35 @@ void MainWindow::add_text_slot(size_t slider_cur_pos, size_t max_slider_buffer )
 
         max_slider_buffer = mte->verticalScrollBar()->maximum();
         scroll_buf=(max_slider_buffer *0.75);
-        }while(slider_cur_pos>max_slider_buffer );
+
+            } else if((buf_start+buf_size)>fsize_){
+
+                size_t buf_final_temp = fsize_-buf_start;
+                QStringRef subbuf(&buffer_,buf_start,buf_final_temp);
+                mte->insertHtml(
+                                "<pre style=\"white-space: pre-wrap;\">"+
+                            subbuf.toString()
+//                                .replace(QString("\n"), QString("<br>"))
+                                +"</pre>"
+                                );
+//                mte->insertHtml(subbuf.toString());
+                end_file=true;
+                scroll_buf=0;
+                buf_start=0;
+
+                if(slider_cur_pos>max_slider_buffer){
+                mte->verticalScrollBar()->setSliderPosition(mte->verticalScrollBar()->maximum());
+
+                return;
+                }
+            }
+
+        }while(slider_cur_pos>max_slider_buffer);
+
     }
+
     mte->verticalScrollBar()->setSliderPosition(slider_cur_pos);
+
 }
 
 
@@ -852,6 +917,70 @@ void MainWindow::set_cursor_slot(int positio)
     cursor.setPosition(positio);
     mte->setTextCursor(cursor);
     qDebug() << "SIGNAL CURSOR EMITED";
+}
+
+void MainWindow::long_text_add_slot()
+{
+//    qDebug() << "Wait slot emitted";
+//    this->setCursor(Qt::WaitCursor);
+//    do{
+//        mte->setPlainText(buffer_);
+//    }while(0);
+//    this->setCursor(Qt::ArrowCursor);
+
+size_t i=0;
+    do{
+
+        if((buf_start+buf_size)<=plain_fsize_){
+
+    QStringRef subbuf(&buffer_,buf_start,buf_size);
+
+    mte->insertPlainText(
+//                    "<pre style=\"white-space: pre-wrap;\">"+
+                    subbuf.toString()
+//                    +"</pre>"
+                    );
+
+    buf_start+= buf_size;
+
+
+
+        } else if((buf_start+buf_size)>plain_fsize_){
+
+            size_t buf_final_temp = plain_fsize_-buf_start;
+            QStringRef subbuf(&buffer_,buf_start,buf_final_temp);
+            mte->insertPlainText(
+//                            "<pre style=\"white-space: pre-wrap;\">"+
+                        subbuf.toString()
+//                                .replace(QString("\n"), QString("<br>"))
+//                            +"</pre>"
+                            );
+//                mte->insertHtml(subbuf.toString());
+            end_file=true;
+            scroll_buf=0;
+            buf_start=0;
+
+            this->setCursor(Qt::ArrowCursor);
+            //emit cursor_shape_signal(0);
+            return;
+        }
+++i;
+    }while(1);                                                   /////////////////////!!!!!!!!!!!!!!!!!!!!!!1
+
+    this->setCursor(Qt::ArrowCursor);
+emit cursor_shape_signal(0);
+    ProcessIsFinished = true;
+    on_pushButton_clicked();
+
+}
+
+void MainWindow::cursor_shape_slot(int shape)
+{
+    switch(shape){
+    case 0:  this->setCursor(Qt::ArrowCursor); break;
+    case 2:  this->setCursor(Qt::WaitCursor); break;
+    default: this->setCursor(Qt::ArrowCursor); break;
+    }
 }
 
 //void MainWindow::set_cursor_slot(size_t positio)
@@ -880,6 +1009,7 @@ void MainWindow::clc_released()
 
 void MainWindow::on_bigRead_button_clicked()
 {
+    mte->verticalScrollBar()->setSliderPosition(mte->verticalScrollBar()->maximum());
     if(end_file) return;
     else
     if(fsize_<maxfullsize) return;
@@ -928,4 +1058,14 @@ void MainWindow::on_search_clc_button_clicked()
     scroll_buf=0;
     buf_start=0;
     //%%%%%%%%%%%%%%%%
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    this->setCursor(Qt::ArrowCursor);
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    this->setCursor(Qt::WaitCursor);
 }

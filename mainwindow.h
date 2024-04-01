@@ -52,6 +52,10 @@ private slots:
 
     void on_search_clc_button_clicked();
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
 public slots:
 
     void search_slot(QString str="",bool highlight=false,int color=0);
@@ -76,6 +80,10 @@ public slots:
 
     //void slider_slot(int,int);
 
+    void long_text_add_slot();
+
+    void cursor_shape_slot(int);
+
 signals:
 
     void add_text_signal(size_t,size_t);
@@ -87,6 +95,10 @@ signals:
     //void set_cursor_signal(size_t);
 
     //void set_cursor_signal(QTextCursor);
+
+    void long_text_add_signal();
+
+    void cursor_shape_signal(int);
 
 private:
     Ui::MainWindow *ui;
@@ -120,6 +132,8 @@ private:
     bool end_file;
     //bool is_split;
     QTextCharFormat format;
+
+    bool ProcessIsFinished;
 
     int cursor_position;
 };
