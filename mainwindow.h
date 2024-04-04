@@ -41,16 +41,16 @@ private slots:
 
     void on_actionOpen_triggered();
 
-    void on_reset_text_clicked();
+//    void on_reset_text_clicked();
 
     void on_actionExit_triggered();
 
-    void clc_released();
+//    void clc_released();
 
 
-    void on_bigRead_button_clicked();
+//    void on_bigRead_button_clicked();
 
-    void on_search_clc_button_clicked();
+//    void on_search_clc_button_clicked();
 
     void on_pushButton_clicked();
 
@@ -70,6 +70,8 @@ public slots:
 
     void add_text_slot(size_t,size_t);
 
+    void add_text_slot_2limit(size_t);
+
     void set_position_slot(size_t);
 
     void set_cursor_slot(int);
@@ -84,21 +86,27 @@ public slots:
 
     void cursor_shape_slot(int);
 
+    //void single_shot_slot();
+
 signals:
 
     void add_text_signal(size_t,size_t);
+
+    void add_text_signal_2limit(size_t); //new
 
     void set_position_signal(size_t);
 
     void set_cursor_signal(int);
 
-    //void set_cursor_signal(size_t);
+    void set_cursor_signal(size_t);
 
     //void set_cursor_signal(QTextCursor);
 
     void long_text_add_signal();
 
     void cursor_shape_signal(int);
+
+    //void single_shot_signal();
 
 private:
     Ui::MainWindow *ui;
@@ -136,5 +144,8 @@ private:
     bool ProcessIsFinished;
 
     int cursor_position;
+
+    size_t end_text_cursor_pos_;
+    bool text_cursor_isSet_toEnd;
 };
 #endif // MAINWINDOW_H

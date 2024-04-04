@@ -38,53 +38,11 @@
     <property name="cursor">
      <cursorShape>WhatsThisCursor</cursorShape>
     </property>
+    <property name="toolTip">
+     <string>Search function. Disabled until the some file will be opened.</string>
+    </property>
     <property name="text">
      <string>🔍</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="reset_text">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>320</y>
-      <width>141</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Reset search highlight</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="bigRead_button">
-    <property name="geometry">
-     <rect>
-      <x>810</x>
-      <y>590</y>
-      <width>80</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>BigRead</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="search_clc_button">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>540</y>
-      <width>80</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>clc (search)</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
