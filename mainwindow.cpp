@@ -372,8 +372,8 @@ qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::
     QFile file(open_file);
     if(file.size()>file_size_limit_){
         QMessageBox::warning(0,"File size warning",QString("Sorry, current version of programm not "
-                               "supporting large files with size bigger then %1 bytes.:(")
-                             .arg(QString::number(file_size_limit_)));
+                               "supporting large files with size bigger then %1 megabytes.:(")
+                             .arg(QString::number(static_cast<double>(file_size_limit_/1000000.))));
      return;
     }
         if(!file.open(QIODevice::ReadOnly))
