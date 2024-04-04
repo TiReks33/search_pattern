@@ -108,9 +108,12 @@ signals:
 
     //void single_shot_signal();
 
+    void total_occur(size_t);
+
 private:
     Ui::MainWindow *ui;
     Dialog * d_;
+    Result * r_;
     size_t occurrences;
 
     MineTextEdit *mte;

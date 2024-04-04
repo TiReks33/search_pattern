@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , d_(new Dialog)
+    , r_(new Result)
     , occurrences(0)
     , mte(new MineTextEdit)
     , buffer_("")
@@ -44,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     , file_path_(QDir::homePath())
     , file_name_("")
     , temp_file_path_(QDir::tempPath())
-    , temp_file_prefix_("/.$temp_")
+    , temp_file_prefix_("$temp_")
     , temp_subfolder_()
     , full_tmp_f_path_(temp_file_path_)
 
@@ -63,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ProcessIsFinished(false)
     , end_text_cursor_pos_(0)
     , text_cursor_isSet_toEnd(false)
-    , file_size_limit_(24000000) //24mb
+    , file_size_limit_(24000000) //[24mb24.5]
 {
     ui->setupUi(this);
 //"Search button"
@@ -98,14 +99,14 @@ MainWindow::MainWindow(QWidget *parent)
     layout3->addWidget(ui->search_button);
 
     search_widget->setFixedSize(175,175);
-    search_widget->move(650,350);
+    search_widget->move(600,350);
     search_widget->show();
 
-    QPushButton *clc_button = new QPushButton(this);
-    clc_button->setText("clear screen");
-    clc_button->setFixedSize(100,50);
-    clc_button->move(700,500);
-    clc_button->show();
+//    QPushButton *clc_button = new QPushButton(this);
+//    clc_button->setText("clear screen");
+//    clc_button->setFixedSize(100,50);
+//    clc_button->move(700,500);
+//    clc_button->show();
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====SIGNALS=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -134,6 +135,8 @@ MainWindow::MainWindow(QWidget *parent)
        connect(this,&MainWindow::long_text_add_signal, this, &MainWindow::long_text_add_slot,Qt::QueuedConnection);
        connect(this,SIGNAL(cursor_shape_signal(int)),this,SLOT(cursor_shape_slot(int)));
        //connect(this,SIGNAL(single_shot_signal()),this,SLOT(single_shot_slot()), Qt::QueuedConnection);
+
+       connect(this,SIGNAL(total_occur(size_t)),r_,SLOT(total_occur_slot(size_t)));
 
 mte->setFont(QFont("DejaVu Sans Mono"));
 //this->mte->setUndoRedoEnabled(false);
@@ -302,14 +305,16 @@ after=text.substr(start_pos);
 
     main_string+=QString::fromStdString(after);
 
-    Result * r=new Result{};
+    //Result * r=new Result{};
 
-     if(occurrences==0)
-     r->search_results(result,'r');
-     else
-     r->search_results(result);
-
-     r->show();
+     if(occurrences==0){
+     r_->search_results(result,'r');
+     emit total_occur(0);
+     }else{
+     r_->search_results(result);
+     emit total_occur(occurrences);
+     }
+     r_->show();
 
      buffer_.clear();
 
@@ -323,7 +328,7 @@ void MainWindow::on_search_button_clicked()
 {
     //QString file_dir = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
         //QFile file("/home/alexander/cpp/$temp1");
-if(mte->isReadOnly())mte->signal();
+if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
     temp_subfolder_ = temp_file_path_ + "/";
     //temp_subfolder_ = temp_file_path_ + "/" + prog_name_;
 
@@ -332,7 +337,7 @@ if(mte->isReadOnly())mte->signal();
     if (!dir.exists())
         dir.mkpath(".");
 
-          full_tmp_f_path_ = temp_subfolder_ + temp_file_prefix_ + file_name_;
+          full_tmp_f_path_ = temp_subfolder_ + '.' + temp_file_prefix_ + file_name_;
           QFile file(full_tmp_f_path_);
 
         if(!file.open(QIODevice::WriteOnly)){
@@ -533,6 +538,8 @@ qDebug() << "123456 FSIZE_::" << fsize_;
         mte->verticalScrollBar()->setSliderPosition(position_);
 
          end_file=true;                                          //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
+         set_cursor_slot(first_occurrence_);
 
         }else if(fsize_>=maxfullsize){
 
@@ -773,7 +780,7 @@ void MainWindow::format_slot(const QTextCharFormat &f)
 
 void MainWindow::mouse_press_slot()
 {
-    cursor_position = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+    //cursor_position = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
     ui->statusbar->showMessage(QString::number(cursor_position));
     mte->setCurrentCharFormat(format);
 }
@@ -786,7 +793,7 @@ void MainWindow::add_text_slot(size_t slider_cur_pos, size_t max_slider_buffer )
     if(fsize_<maxfullsize) return;                                                 // fsize_ OR plain_fsize_?????????????
     else if(slider_cur_pos>max_slider_buffer )
     {
-
+if(!text_cursor_isSet_toEnd){set_cursor_slot(end_text_cursor_pos_);text_cursor_isSet_toEnd=true;}
         do{
 
             if((buf_start+buf_size)<=fsize_){
@@ -834,30 +841,35 @@ void MainWindow::add_text_slot(size_t slider_cur_pos, size_t max_slider_buffer )
 }
 
 
-void MainWindow::add_text_slot_2limit(size_t limit_pos)
+void MainWindow::add_text_slot_2limit(size_t limit_pos) //!!
 {
  //if(end_file)return;
+    //if(!text_cursor_isSet_toEnd){set_cursor_slot(end_text_cursor_pos_);text_cursor_isSet_toEnd=true;}
     do{
 if(end_file)break;
 
-        if((buf_start+buf_size)<=plain_fsize_){
+        if((buf_start+buf_size)<=fsize_){
 
     QStringRef subbuf(&buffer_,buf_start,buf_size);
 
-    mte->insertPlainText(
+    mte->insertHtml(
+                    "<pre style=\"white-space: pre-wrap;\">"+
                     subbuf.toString()
+                    +"</pre>"
                     );
 
     buf_start+= buf_size;
 
     scroll_buf=((mte->verticalScrollBar()->maximum())*0.75);
 
-        } else if((buf_start+buf_size)>plain_fsize_){
+        } else if((buf_start+buf_size)>fsize_){
 
-            size_t buf_final_temp = plain_fsize_-buf_start;
+            size_t buf_final_temp = fsize_-buf_start;
             QStringRef subbuf(&buffer_,buf_start,buf_final_temp);
-            mte->insertPlainText(
-                        subbuf.toString()
+            mte->insertHtml(
+                            "<pre style=\"white-space: pre-wrap;\">"+
+                            subbuf.toString()
+                            +"</pre>"
                             );
 
             end_file=true;

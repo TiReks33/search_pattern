@@ -19,6 +19,10 @@ public:
 
     void search_results(QString&,char);
 
+public slots:
+
+    void total_occur_slot(size_t);
+
 private:
     Ui::Result *ui;
 };
