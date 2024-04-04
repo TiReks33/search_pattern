@@ -52,9 +52,9 @@ private slots:
 
 //    void on_search_clc_button_clicked();
 
-    void on_pushButton_clicked();
+//    void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+//   void on_pushButton_2_clicked();
 
 public slots:
 
@@ -147,5 +147,7 @@ private:
 
     size_t end_text_cursor_pos_;
     bool text_cursor_isSet_toEnd;
+
+    int file_size_limit_;
 };
 #endif // MAINWINDOW_H

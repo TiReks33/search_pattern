@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ProcessIsFinished(false)
     , end_text_cursor_pos_(0)
     , text_cursor_isSet_toEnd(false)
+    , file_size_limit_(24000000) //24mb
 {
     ui->setupUi(this);
 //"Search button"
@@ -369,9 +370,23 @@ void MainWindow::on_actionOpen_triggered()
 qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::tempPath();
 
     QFile file(open_file);
+    if(file.size()>file_size_limit_){
+        QMessageBox::warning(0,"File size warning",QString("Sorry, current version of programm not "
+                               "supporting large files with size bigger then %1 bytes.:(")
+                             .arg(QString::number(file_size_limit_)));
+     return;
+    }
         if(!file.open(QIODevice::ReadOnly))
             QMessageBox::information(0,"info",file.errorString());
         else{
+
+            end_file=false;
+            scroll_buf=0;
+            buf_start=0;
+
+            end_text_cursor_pos_=0;
+            text_cursor_isSet_toEnd=false;
+
             mte->clear();
             QTextStream in(&file);
             plain_fsize_=file.size();
@@ -410,7 +425,8 @@ else {;}
 
                 this->setCursor(Qt::WaitCursor);
 
-                emit long_text_add_signal();
+                //emit long_text_add_signal();
+                       long_text_add_slot();
                        //mte->insertPlainText(buffer_);
 
         }
@@ -564,6 +580,7 @@ end_text_cursor_pos_=mte->textCursor().position();
                                 qDebug() << "AFTER cursor position" << mte->textCursor().position();
                                 qDebug() << "AFTER cursor end" << QTextCursor::End;
                             } else { //{3}
+                                qDebug() << "CASE {3}";
                                 //emit add_text_signal_2limit(first_occurrence_);
                                  add_text_slot_2limit(first_occurrence_);
                                 }
@@ -577,9 +594,9 @@ end_text_cursor_pos_=mte->textCursor().position();
 
 
                 } else { //{1}
-
-                     emit add_text_signal(position_,max_scroll);
-
+                    qDebug() << "CASE {1}";
+                     //emit add_text_signal(position_,max_scroll);
+                            add_text_slot(position_,max_scroll);
                 //mte->verticalScrollBar()->setSliderPosition(position_);
              }
 
@@ -939,12 +956,12 @@ void MainWindow::cursor_shape_slot(int shape)
 
 
 
-void MainWindow::on_pushButton_clicked()
-{
-    this->setCursor(Qt::ArrowCursor);
-}
+//void MainWindow::on_pushButton_clicked()
+//{
+//    this->setCursor(Qt::ArrowCursor);
+//}
 
-void MainWindow::on_pushButton_2_clicked()
-{
-    this->setCursor(Qt::WaitCursor);
-}
+//void MainWindow::on_pushButton_2_clicked()
+//{
+//    this->setCursor(Qt::WaitCursor);
+//}
