@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/rec/icons">
+        <file>rec/icons/exit_2.png</file>
+        <file>rec/icons/exit.png</file>
+        <file>rec/icons/save.png</file>
+        <file>rec/icons/search_file-0.png</file>
+        <file>rec/icons/save_as.png</file>
+        <file>rec/icons/open.png</file>
+        <file>rec/icons/new.png</file>
+        <file>rec/icons/accesibility_window_abc.png</file>
+        <file>rec/icons/undo.png</file>
+        <file>rec/icons/restore.png</file>
+        <file>rec/icons/search2.png</file>
+        <file>rec/icons/scissors_proprietary.png</file>
+        <file>rec/icons/cpy.png</file>
+        <file>rec/icons/cpy_cpy.png</file>
+        <file>rec/icons/floppy_disk2.png</file>
+        <file>rec/icons/floppy_disk.png</file>
+        <file>rec/icons/floppy_alt_2.png</file>
+        <file>rec/icons/floppy_alt_1.png</file>
+        <file>rec/icons/floppy_alt_2_ver2.png</file>
+        <file>rec/icons/floppy_alt_2_ver3.png</file>
+    </qresource>
+</RCC>

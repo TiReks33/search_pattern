@@ -21,6 +21,7 @@ public:
 
     void closeEvent(QCloseEvent *event);
 
+    void buttons_enabled(bool);
 
 
     void search_highlight(const std::string& text,const char*pattern,int color);
@@ -55,6 +56,22 @@ private slots:
 //    void on_pushButton_clicked();
 
 //   void on_pushButton_2_clicked();
+
+    void on_actionStart_search_triggered();
+
+    void on_actionStart_search_2_triggered();
+
+    void on_actionNew_triggered();
+
+    void on_actionCut_triggered();
+
+    void on_actionUndo_triggered();
+
+    void on_actionRedo_triggered();
+
+    void on_actionCopy_triggered();
+
+    void on_actionPaste_triggered();
 
 public slots:
 

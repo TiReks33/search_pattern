@@ -67,16 +67,34 @@ MainWindow::MainWindow(QWidget *parent)
     , file_size_limit_(24000000) //[24mb24.5]
 {
     ui->setupUi(this);
-//"Search button"
-       ui->search_button->setFixedHeight(50);
-       ui->search_button->setFixedWidth(50);
-       QRect rect(0,0,50,50);
+
+    //setStyleSheet("QMainWindow {background-image:url(/home/alexander/Pictures/windowswallpaper.jpg);}");
+    //setStyleSheet("QMainWindow {background-color: rgb(195,216,246);}");
+    setStyleSheet("QMainWindow {background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #55a3db, stop: 1 #dfecf6);}"
+"QToolBar::separator{ width:2px;background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd); }"
+"");
+    //setStyleSheet("QMainWindow {background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);}");
+
+    ui->toolBar->setStyleSheet("border:none;background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #dfecf6, stop: 1 #55a3db);");
+
+mte->verticalScrollBar()->setStyleSheet("background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);");
+    //"Search button"
+//       ui->search_button->setMinimumHeight(50);
+       //ui->search_button->setFixedHeight(50);
+//       ui->search_button->setMinimumWidth(50);
+       //ui->search_button->setFixedWidth(50);
+       ui->search_button->setFixedSize(67,67);
+        QRect rect(0,0,67,67);
        QRegion region(rect, QRegion::Ellipse);
        ui->search_button->setMask(region);
+ui->search_button->setStyleSheet("border: none;"
+            "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
 
+                                 "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #5598c9, stop: 1 #a9d5f5);"
+                                );
 
 //1st widget (main editor window)
-       QWidget *centralWidget = new QWidget(this);
+       /*QWidget *centralWidget = new QWidget(this);
     centralWidget->setFixedSize(660,660);
     centralWidget->move(0,30);
 
@@ -85,22 +103,31 @@ MainWindow::MainWindow(QWidget *parent)
 
     layout->addWidget(mte,50);
 
-    mte->setReadOnly(false);
+    mte->setReadOnly(false)*/;
 
 //2nd widget (func but)
 
-
+QWidget *centralWidget1 = new QWidget(this);
+centralWidget1->move(0,30);
+//QGridLayout * layout1 = new QGridLayout(centralWidget1);
+QHBoxLayout * layout1 = new QHBoxLayout(centralWidget1);
+centralWidget1->setMinimumSize(640,480);
+centralWidget1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+layout1->addWidget(mte);
+layout1->addWidget(ui->search_button);
+setCentralWidget(centralWidget1);
+centralWidget1->show();
 
 
 //3d widget (for "search button")
-    QWidget *search_widget = new QWidget(this);
+    /*QWidget *search_widget = new QWidget(this);
     QGridLayout * layout3 = new QGridLayout(search_widget);
 
     layout3->addWidget(ui->search_button);
 
     search_widget->setFixedSize(175,175);
-    search_widget->move(600,350);
-    search_widget->show();
+    search_widget->move(576,196);
+    search_widget->show()*/;
 
 //    QPushButton *clc_button = new QPushButton(this);
 //    clc_button->setText("clear screen");
@@ -182,6 +209,32 @@ size_t strlenpp(char *str)
 }
 
 
+void MainWindow::buttons_enabled(bool on_off)
+{
+    ui->menuEdit->setEnabled(on_off);
+    ui->actionStart_search->setEnabled(on_off);
+    ui->actionStart_search_2->setEnabled(on_off);
+    ui->menuSearch->setEnabled(on_off);
+    ui->actionSave->setEnabled(on_off);
+    ui->actionSave_as->setEnabled(on_off);
+
+    //"Search" button-->
+    ui->search_button->setEnabled(true);
+
+    ui->search_button->setStyleSheet("border: none;"
+                "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
+
+                                     "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd);"
+                                    );
+
+    ui->search_button->setToolTip(
+                                  "<font style=\"color:black;\">"
+                                  "Search function.\nClick to enter the search pattern."
+                                  "</font>"
+                                  );
+    //<--"Search" button
+}
+
 
 // result pattern indexes in text
 void MainWindow::search_highlight(std::string const & text, char const *pattern,int color)
@@ -199,8 +252,9 @@ void MainWindow::search_highlight(std::string const & text, char const *pattern,
            if(!color)    { color_ = "orange";
     } else if(color == 1){ color_ = "pink";
     } else if(color == 2){ color_ = "yellow";
-    } else if(color == 3){ color_ = "green";
-    } else if(color == 4){ color_ = "red";
+    } else if(color == 3){ color_ = "#43e346";//"green";
+    } else if(color == 4){ color_ = "#ff6262";//"red";
+    } else if(color == 5){ color_ = "#609aee";//light-blue
     }
 
     occurrences=0;
@@ -262,8 +316,9 @@ void MainWindow::search_highlight_occurrences(std::string const & text, char con
            if(!color)    { color_ = "orange";
     } else if(color == 1){ color_ = "pink";
     } else if(color == 2){ color_ = "yellow";
-    } else if(color == 3){ color_ = "green";
-    } else if(color == 4){ color_ = "red";
+    } else if(color == 3){ color_ = "#43e346";//"green";
+    } else if(color == 4){ color_ = "#ff6262";//"red";
+    } else if(color == 5){ color_ = "#609aee";//light-blue
     }
 
     occurrences=0;
@@ -384,7 +439,7 @@ qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::
         if(!file.open(QIODevice::ReadOnly))
             QMessageBox::information(0,"info",file.errorString());
         else{
-
+buttons_enabled(true);
             end_file=false;
             scroll_buf=0;
             buf_start=0;
@@ -436,7 +491,7 @@ else {;}
 
         }
 
-ui->search_button->setEnabled(true);
+/*ui->search_button->setEnabled(true);
 ui->search_button->setStyleSheet("background-color: blue;");
 
 //"<span style=\"background-color:"+color_+";\">"
@@ -446,7 +501,7 @@ ui->search_button->setStyleSheet("background-color: blue;");
 //                +"</span>";
 
 
-ui->search_button->setToolTip("<font style=\"background-color:yellow;\">Search function. Click to enter the search pattern.</font>");
+ui->search_button->setToolTip("<font style=\"background-color:yellow;\">Search function. Click to enter the search pattern.</font>")*/;
 
 //mte->setStyleSheet("");
 
@@ -961,19 +1016,44 @@ void MainWindow::cursor_shape_slot(int shape)
     }
 }
 
-//void MainWindow::single_shot_slot()
-//{
 
-//}
+// DESIGN //
+void MainWindow::on_actionStart_search_triggered()
+{
+    on_search_button_clicked();
+}
 
+void MainWindow::on_actionStart_search_2_triggered()
+{
+    on_search_button_clicked();
+}
 
+void MainWindow::on_actionNew_triggered()
+{
+    buttons_enabled(true);
+}
 
-//void MainWindow::on_pushButton_clicked()
-//{
-//    this->setCursor(Qt::ArrowCursor);
-//}
+void MainWindow::on_actionCut_triggered()
+{
+    mte->cut();
+}
 
-//void MainWindow::on_pushButton_2_clicked()
-//{
-//    this->setCursor(Qt::WaitCursor);
-//}
+void MainWindow::on_actionUndo_triggered()
+{
+    mte->undo();
+}
+
+void MainWindow::on_actionRedo_triggered()
+{
+    mte->redo();
+}
+
+void MainWindow::on_actionCopy_triggered()
+{
+    mte->copy();
+}
+
+void MainWindow::on_actionPaste_triggered()
+{
+    mte->paste();
+}
