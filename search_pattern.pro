@@ -13,18 +13,21 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     minetextedit.cpp \
-    result.cpp
+    result.cpp \
+    savedialog.cpp
 
 HEADERS += \
     dialog.h \
     mainwindow.h \
     minetextedit.h \
-    result.h
+    result.h \
+    savedialog.h
 
 FORMS += \
     dialog.ui \
     mainwindow.ui \
-    result.ui
+    result.ui \
+    savedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

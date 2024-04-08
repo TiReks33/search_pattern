@@ -6,6 +6,7 @@
 #include <QTextEdit>
 #include "minetextedit.h"
 #include <QTextStream>
+#include <savedialog.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,7 +22,7 @@ public:
 
     void closeEvent(QCloseEvent *event);
 
-    void buttons_enabled(bool);
+    void buttons_enabled(bool on_off=true);
 
 
     void search_highlight(const std::string& text,const char*pattern,int color);
@@ -73,6 +74,14 @@ private slots:
 
     void on_actionPaste_triggered();
 
+    void on_actionAbout_Qt_triggered();
+
+    void on_actionAbout_Search_pattern_triggered();
+
+    void on_actionSave_triggered();
+
+    void on_actionSave_as_triggered();
+
 public slots:
 
     void search_slot(QString str="",bool highlight=false,int color=0);
@@ -104,6 +113,8 @@ public slots:
     void cursor_shape_slot(int);
 
     //void single_shot_slot();
+
+    void need_save();
 
 signals:
 
@@ -169,5 +180,12 @@ private:
     bool text_cursor_isSet_toEnd;
 
     int file_size_limit_;
+
+    bool need_save_;
+    bool need_save_as_;
+
+    saveDialog* save_;
+    bool buttons_isEnabled_;
+
 };
 #endif // MAINWINDOW_H

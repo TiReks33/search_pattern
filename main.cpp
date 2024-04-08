@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
+    w.setWindowIcon(QIcon(":/rec/icons/rec/icons/search2.png"));
     w.show();
     return a.exec();
 }

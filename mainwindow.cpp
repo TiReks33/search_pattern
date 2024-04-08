@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "dialog.h"
 #include "minetextedit.h"
+#include "savedialog.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -65,9 +66,14 @@ MainWindow::MainWindow(QWidget *parent)
     , end_text_cursor_pos_(0)
     , text_cursor_isSet_toEnd(false)
     , file_size_limit_(24000000) //[24mb24.5]
+    , need_save_(false)
+    , need_save_as_(true)
+    , save_(new saveDialog)
+    , buttons_isEnabled_(false)
 {
     ui->setupUi(this);
-
+   //mte->setDisabled(true);
+   //mte->blockSignals(true);
     //setStyleSheet("QMainWindow {background-image:url(/home/alexander/Pictures/windowswallpaper.jpg);}");
     //setStyleSheet("QMainWindow {background-color: rgb(195,216,246);}");
     setStyleSheet("QMainWindow {background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #55a3db, stop: 1 #dfecf6);}"
@@ -119,6 +125,12 @@ setCentralWidget(centralWidget1);
 centralWidget1->show();
 
 
+mte->setFont(QFont("DejaVu Sans Mono"));
+
+mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+
+
 //3d widget (for "search button")
     /*QWidget *search_widget = new QWidget(this);
     QGridLayout * layout3 = new QGridLayout(search_widget);
@@ -142,7 +154,6 @@ centralWidget1->show();
        //connect(clc_button, SIGNAL (released()),this, SLOT (clc_released()));
 
        //mte->verticalScrollBar()->
-       mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
        connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
        connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
@@ -165,8 +176,17 @@ centralWidget1->show();
 
        connect(this,SIGNAL(total_occur(size_t)),r_,SLOT(total_occur_slot(size_t)));
 
-mte->setFont(QFont("DejaVu Sans Mono"));
+       connect(mte, &MineTextEdit::textChanged, this, &MainWindow::need_save);
+
+       connect(save_,&saveDialog::save_signal, this, &MainWindow::on_actionSave_triggered);
+
+
 //this->mte->setUndoRedoEnabled(false);
+
+//mte->setEnabled(false);
+qDebug() << QDir::tempPath();
+
+//mte->blockSignals(false);
 }
 
 MainWindow::~MainWindow()
@@ -233,6 +253,8 @@ void MainWindow::buttons_enabled(bool on_off)
                                   "</font>"
                                   );
     //<--"Search" button
+
+    buttons_isEnabled_=true;
 }
 
 
@@ -424,7 +446,6 @@ if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
 
 void MainWindow::on_actionOpen_triggered()
 {
-
     QString open_file = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
 
 qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::tempPath();
@@ -1030,7 +1051,55 @@ void MainWindow::on_actionStart_search_2_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    buttons_enabled(true);
+    if(need_save_&&(!mte->document()->isEmpty())){
+    //this->save_=new saveDialog;
+        //this->save_->setModal(true);
+        this->save_->show();
+        this->save_->exec();
+        if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;return;}
+    }
+
+//    QFile file(QDir::tempPath()+"/.$unsaved_file");
+
+//        if(!file.open(QIODevice::ReadOnly))
+//            QMessageBox::information(0,"info",file.errorString());
+//        else{
+//            buttons_enabled(true);
+
+//            end_file=true;
+//            scroll_buf=0;
+//            buf_start=0;
+
+//            end_text_cursor_pos_=0;
+//            text_cursor_isSet_toEnd=true;
+
+//            mte->clear();
+//            QTextStream in(&file);
+
+//            file_path_=QFileInfo(file).path();
+//            file_name_ = QFileInfo(file).fileName();
+//            temp_file_path_ = file_path_;
+//            file.close();
+
+//        }
+
+                this->save_->is_cancel_button_clicked()=false;
+                buttons_enabled(true);
+
+                end_file=true;
+                scroll_buf=0;
+                buf_start=0;
+
+                end_text_cursor_pos_=0;
+                text_cursor_isSet_toEnd=true;
+
+
+                mte->clear();
+
+                //need_save_=true;
+                need_save_as_=true;
+
+
 }
 
 void MainWindow::on_actionCut_triggered()
@@ -1056,4 +1125,144 @@ void MainWindow::on_actionCopy_triggered()
 void MainWindow::on_actionPaste_triggered()
 {
     mte->paste();
+}
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    QMessageBox::aboutQt(0,"");
+}
+
+void MainWindow::on_actionAbout_Search_pattern_triggered()
+{
+QString logo="";
+QString abc=":/rec/icons/rec/icons/accesibility_window_abc.png";
+abc="<img src='"+abc+"' height='32' width='32'>";
+QString tux=":/rec/icons/rec/icons/tux_color.png";
+tux="<img src='"+tux+"' height='48' width='48'>";
+QString input=":/rec/icons/rec/icons/input_devices.png";
+input="<img src='"+input+"' height='32' width='32'>";
+QString screen=":/rec/icons/rec/icons/monitor_windows.png";
+screen="<img src='"+screen+"' height='32' width='32'>";
+QString loop=":/rec/icons/rec/icons/search2.png";
+loop="<img src='"+loop+"' height='32' width='32'>";
+QString note=":/rec/icons/rec/icons/notepad-5.png";
+note="<img src='"+note+"' height='32' width='32'>";
+QString mouse=":/rec/icons/rec/icons/mouse-0.png";
+mouse="<img src='"+mouse+"' height='32' width='32'>";
+QString kbmouse=":/rec/icons/rec/icons/kbmouse.png";
+kbmouse="<img src='"+kbmouse+"' height='32' width='32'>";
+QString success=":/rec/icons/rec/icons/success.png";
+success="<img src='"+success+"' height='32' width='32'>";
+
+    QFile file(":/rec/icons/rec/icons/logo.txt");
+//qDebug() << dir;
+        if(!file.open(QIODevice::ReadOnly))
+            ;
+        else{
+            QTextStream in(&file);
+        logo="<pre style=\"white-space: pre-wrap;\">"+in.readAll()+"</pre>";
+        file.close();
+        }
+
+    QMessageBox::about(0,"Search Pattern about",note+loop+tux+kbmouse+abc+success+
+                         "<p style=\"font-family:'Serif';font-size:22px;\">Plain text edit with "
+                         "multiply occurrences search functional. "
+                         "Program uses <b>std::string</b>'s very optimized methods in search algorithm;"
+                         " was made JFF and Qt/C++ learning basic technics goal.:)</p><br>"
+                                          +logo);
+}
+
+void MainWindow::need_save()
+{
+    need_save_=true;
+    qDebug() << "YES::" << mte->document()->isEmpty();
+    if((!buttons_isEnabled_)&&(!mte->document()->isEmpty()))buttons_enabled(true);
+    //mte->blockSignals(false);
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    if(need_save_as_){
+
+        on_actionSave_as_triggered();
+        //return;
+    } else
+    {
+
+
+        QString subfolder_ = file_path_+'/'+file_name_;
+        //temp_subfolder_ = temp_file_path_ + "/" + prog_name_;
+
+        // Checking if temp directory exist -- else create it!
+        QDir dir(subfolder_);
+        if (!dir.exists())
+            dir.mkpath(".");
+
+              QFile file(subfolder_);
+
+            if(!file.open(QIODevice::WriteOnly)){
+
+                QMessageBox p;
+                        p.warning(0,"Error","Save data error. "
+                "Please, check read/write permissions in current file directory, ");
+                        qDebug() << "ERROR READING FILE:" << file.fileName();
+                        return;
+
+            }else{
+
+            QTextStream stream(&file);
+
+            stream << mte->toPlainText();
+
+            file.close();
+
+            }
+
+
+    }
+
+    need_save_=false;
+}
+
+void MainWindow::on_actionSave_as_triggered()
+{
+
+    QString save_as_file = QFileDialog::getSaveFileName(this, "Save as", QDir::homePath());
+
+    if(!save_as_file.isEmpty()&& !save_as_file.isNull())
+    {
+
+    QFile file(save_as_file);
+
+    if(!file.open(QIODevice::WriteOnly))
+        QMessageBox::information(0,"info",file.errorString());
+    else{
+        buttons_enabled(true);
+
+        end_file=true;
+        scroll_buf=0;
+        buf_start=0;
+
+        end_text_cursor_pos_=0;
+        text_cursor_isSet_toEnd=true;
+
+
+        QTextStream stream(&file);
+
+        stream << mte->toPlainText();
+
+
+        file_path_=QFileInfo(file).path();
+        file_name_ = QFileInfo(file).fileName();
+
+        qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_;
+
+        file.close();
+
+    }
+
+    need_save_as_=false;
+
+    }
+
 }
