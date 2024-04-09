@@ -7,6 +7,8 @@
 #include "minetextedit.h"
 #include <QTextStream>
 #include <savedialog.h>
+#include "dockwidget.h"
+#include "hints.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,10 +27,13 @@ public:
     void buttons_enabled(bool on_off=true);
 
 
-    void search_highlight(const std::string& text,const char*pattern,int color);
+    void search_highlight(const std::string& text,const std::string& pattern,int color);
 
-    void search_highlight_occurrences(const std::string& text,const char*pattern,int color);
+    void search_highlight_w(const std::wstring& text,const std::wstring& pattern,int color);
 
+    void search_highlight_occurrences(const std::string& text,const std::string& pattern,int color);
+
+    void search_highlight_occurrences_w(const std::wstring& text,const std::wstring& pattern,int color);
 
 
 
@@ -81,6 +86,12 @@ private slots:
     void on_actionSave_triggered();
 
     void on_actionSave_as_triggered();
+
+    void on_actionOptions_triggered();
+
+    void on_actionOptions_2_triggered();
+
+    void on_actionHints_tips_triggered();
 
 public slots:
 
@@ -187,5 +198,8 @@ private:
     saveDialog* save_;
     bool buttons_isEnabled_;
     bool play_it_safe_close_;
+
+    DockWidget* options;
+    Hints* hints;
 };
 #endif // MAINWINDOW_H

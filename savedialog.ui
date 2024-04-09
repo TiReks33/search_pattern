@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Save before exit</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="3">
@@ -28,7 +28,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Would do you like to save current file changes?</string>
+      <string>Would do you like to save current file changes before exit?</string>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -50,6 +50,9 @@
    </item>
    <item row="1" column="2">
     <widget class="QPushButton" name="pushButton">
+     <property name="styleSheet">
+      <string notr="true">background-color: green;</string>
+     </property>
      <property name="text">
       <string>Save</string>
      </property>
@@ -57,6 +60,9 @@
    </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="pushButton_3">
+     <property name="styleSheet">
+      <string notr="true">background-color: red;</string>
+     </property>
      <property name="text">
       <string>Don't save</string>
      </property>

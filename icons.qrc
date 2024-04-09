@@ -32,5 +32,12 @@
         <file>rec/icons/mouse-0.png</file>
         <file>rec/icons/success.png</file>
         <file>rec/icons/kbmouse.png</file>
+        <file>rec/icons/4.png</file>
+        <file>rec/icons/3.png</file>
+        <file>rec/icons/2.png</file>
+        <file>rec/icons/1.png</file>
+        <file>rec/icons/6.png</file>
+        <file>rec/icons/7.png</file>
+        <file>rec/icons/5.png</file>
     </qresource>
 </RCC>

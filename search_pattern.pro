@@ -10,6 +10,8 @@ CONFIG += c++11
 
 SOURCES += \
     dialog.cpp \
+    dockwidget.cpp \
+    hints.cpp \
     main.cpp \
     mainwindow.cpp \
     minetextedit.cpp \
@@ -18,6 +20,8 @@ SOURCES += \
 
 HEADERS += \
     dialog.h \
+    dockwidget.h \
+    hints.h \
     mainwindow.h \
     minetextedit.h \
     result.h \
@@ -25,6 +29,8 @@ HEADERS += \
 
 FORMS += \
     dialog.ui \
+    dockwidget.ui \
+    hints.ui \
     mainwindow.ui \
     result.ui \
     savedialog.ui

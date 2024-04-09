@@ -3,6 +3,8 @@
 #include "dialog.h"
 #include "minetextedit.h"
 #include "savedialog.h"
+#include "dockwidget.h"
+#include "ui_dockwidget.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -19,6 +21,7 @@
 #include <QTextBlock>
 #include <QTimer>
 #include <QThread>
+#include <QDockWidget>
 
 #include <iostream>
 #include <stdlib.h>
@@ -72,6 +75,9 @@ MainWindow::MainWindow(QWidget *parent)
     , save_(new saveDialog)
     , buttons_isEnabled_(false)
     , play_it_safe_close_(false)
+
+    , options(new DockWidget)
+    , hints(new Hints)
 {
     ui->setupUi(this);
    //mte->setDisabled(true);
@@ -198,6 +204,8 @@ MainWindow::~MainWindow()
     delete mte;
     delete r_;
     delete save_;
+    delete options;
+    delete hints;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -221,6 +229,21 @@ size_t strlenpp(std::string const *str)
     const char * str_temp=str->c_str();
     size_t t = 0;
     for (; str_temp[t]!='\0';++t);
+    return t;
+}
+
+size_t strlenpp(std::string const str)
+{
+    const char * str_temp=str.c_str();
+    size_t t = 0;
+    for (; str_temp[t]!='\0';++t);
+    return t;
+}
+
+size_t strlenpp(std::wstring const str)
+{
+    size_t t = 0;
+    for (; str[t]!='\0';++t);
     return t;
 }
 
@@ -270,7 +293,7 @@ void MainWindow::buttons_enabled(bool on_off)
 
 
 // result pattern indexes in text
-void MainWindow::search_highlight(std::string const & text, char const *pattern,int color)
+void MainWindow::search_highlight(std::string const & text, std::string const & pattern,int color)
 {
     std::string before="";
     std::string after="";
@@ -332,7 +355,68 @@ after=text.substr(start_pos);
 }
 
 
-void MainWindow::search_highlight_occurrences(std::string const & text, char const *pattern,int color)
+void MainWindow::search_highlight_w(const std::wstring &text, const std::wstring &pattern, int color)
+{
+    std::wstring before=L"";
+    std::wstring after=L"";
+    QString main_string="";
+
+    size_t start_pos=0;
+    size_t text_find=0;
+    QString color_="";
+
+    size_t strlen = strlenpp(pattern);
+
+           if(!color)    { color_ = "orange";
+    } else if(color == 1){ color_ = "pink";
+    } else if(color == 2){ color_ = "yellow";
+    } else if(color == 3){ color_ = "#43e346";//"green";
+    } else if(color == 4){ color_ = "#ff6262";//"red";
+    } else if(color == 5){ color_ = "#609aee";//light-blue
+    }
+
+    occurrences=0;
+
+bool frst_=false;
+  do{
+          text_find=text.find(pattern,start_pos);
+
+    if(!frst_){frst_=true;first_occurrence_=text_find;}
+
+            if (text_find==std::string::npos) break;
+
+            ++occurrences;
+
+before=text.substr(start_pos,text_find - start_pos);
+
+
+after=text.substr(text_find,strlen);
+
+
+    main_string+=QString::fromStdWString(before)
+
+                +"<span style=\"background-color:"+color_+";\">"
+
+                +QString::fromStdWString(after)
+
+                +"</span>";
+
+start_pos=text_find+strlen;
+
+    } while(1);
+
+after=text.substr(start_pos);
+
+
+    main_string+=QString::fromStdWString(after);
+
+    buffer_.clear();
+
+    buffer_.append(main_string);
+}
+
+
+void MainWindow::search_highlight_occurrences(std::string const & text, std::string const & pattern,int color)
 {
 
     std::string before="";
@@ -410,6 +494,83 @@ after=text.substr(start_pos);
 
 }
 
+void MainWindow::search_highlight_occurrences_w(std::wstring const & text, std::wstring const & pattern,int color)
+{
+
+    std::wstring before=L"";
+    std::wstring after=L"";
+    QString main_string="";
+    QString result="";
+
+    size_t start_pos=0;
+    size_t text_find=0;
+    QString color_="";
+
+    size_t strlen = strlenpp(pattern);
+
+           if(!color)    { color_ = "orange";
+    } else if(color == 1){ color_ = "pink";
+    } else if(color == 2){ color_ = "yellow";
+    } else if(color == 3){ color_ = "#43e346";//"green";
+    } else if(color == 4){ color_ = "#ff6262";//"red";
+    } else if(color == 5){ color_ = "#609aee";//light-blue
+    }
+
+    occurrences=0;
+
+    bool frst_=false;
+  do{
+          text_find=text.find(pattern,start_pos);
+
+          if(!frst_){frst_=true;first_occurrence_=text_find;}
+
+            if (text_find==std::string::npos) {if(occurrences>0)result+=".";break;} // DOT
+            else if(occurrences>0) result+=", ";     // COMMA
+            ++occurrences;
+            result+=QString::number(text_find);
+
+before=text.substr(start_pos,text_find - start_pos);
+
+
+after=text.substr(text_find,strlen);
+
+
+    main_string+=QString::fromStdWString(before)
+
+                +"<span style=\"background-color:"+color_+";\">"
+
+                +QString::fromStdWString(after)
+
+                +"</span>";
+
+start_pos=text_find+strlen;
+
+    } while(1);
+
+if(occurrences==0)
+result+="Entries not found.:(";
+
+after=text.substr(start_pos);
+
+
+    main_string+=QString::fromStdWString(after);
+
+    //Result * r=new Result{};
+
+     if(occurrences==0){
+     r_->search_results(result,'r');
+     emit total_occur(0);
+     }else{
+     r_->search_results(result);
+     emit total_occur(occurrences);
+     }
+     r_->show();
+
+     buffer_.clear();
+
+     buffer_.append(main_string);
+
+}
 
 
 void MainWindow::on_search_button_clicked()
@@ -610,20 +771,39 @@ text_cursor_isSet_toEnd=false;
 
 
 
+    //char const *pat_cstr = std_pat.c_str();
 
-    std::string str = buffer_.toStdString();
+  if(options->is_option_str()){
+
+          std::string str = buffer_.toStdString();
+          std::string std_pat = pattern.toStdString();
+
+          if(!highlight){
+              search_highlight(str,std_pat,color);
+          }else{
+              search_highlight_occurrences(str,std_pat,color);
+          }
+
+      } else {
+
+    std::wstring wstr=buffer_.toStdWString();
+    std::wstring std_wpat = pattern.toStdWString();
+
+    if(!highlight){
+        search_highlight_w(wstr,std_wpat,color);
+    }else{
+        search_highlight_occurrences_w(wstr,std_wpat,color);
+    }
+
+    }
 
 
-    std::string std_pat = pattern.toStdString();
-    char const *pat_cstr = std_pat.c_str();
-qDebug() << str.data();
 
 
-        if(!highlight){
-            search_highlight(str,pat_cstr,color);
-        }else{
-            search_highlight_occurrences(str,pat_cstr,color);
-        }
+//qDebug() << wstr.data();
+
+
+
 
 
         fsize_ = buffer_.size();
@@ -1297,4 +1477,20 @@ void MainWindow::on_actionSave_as_triggered()
 
     }
 
+}
+
+void MainWindow::on_actionOptions_triggered()
+{
+    //DockWidget * options = new DockWidget;
+    options->show();
+}
+
+void MainWindow::on_actionOptions_2_triggered()
+{
+    on_actionOptions_triggered();
+}
+
+void MainWindow::on_actionHints_tips_triggered()
+{
+    hints->show();
 }
