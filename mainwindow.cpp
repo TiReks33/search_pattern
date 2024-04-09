@@ -1254,8 +1254,10 @@ void MainWindow::on_actionSave_as_triggered()
 
         file_path_=QFileInfo(file).path();
         file_name_ = QFileInfo(file).fileName();
+        temp_file_path_ = file_path_;               //check?
 
-        qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_;
+        qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_ <<
+                    "SAVE AS TEMP FILE PATH AFTER==" << temp_file_path_;
 
         file.close();
 
