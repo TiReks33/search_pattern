@@ -186,6 +186,6 @@ private:
 
     saveDialog* save_;
     bool buttons_isEnabled_;
-
+    bool play_it_safe_close_;
 };
 #endif // MAINWINDOW_H

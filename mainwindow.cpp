@@ -68,8 +68,10 @@ MainWindow::MainWindow(QWidget *parent)
     , file_size_limit_(24000000) //[24mb24.5]
     , need_save_(false)
     , need_save_as_(true)
+
     , save_(new saveDialog)
     , buttons_isEnabled_(false)
+    , play_it_safe_close_(false)
 {
     ui->setupUi(this);
    //mte->setDisabled(true);
@@ -194,12 +196,21 @@ MainWindow::~MainWindow()
     delete ui;
     delete d_;
     delete mte;
+    delete r_;
+    delete save_;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QMessageBox p;
-    p.warning(0,"123","123");
+    //QMessageBox p;
+    //p.warning(0,"123","123");
+    if((need_save_&&(!mte->document()->isEmpty()))||play_it_safe_close_){
+    //this->save_=new saveDialog;
+        //this->save_->setModal(true);
+        this->save_->show();
+        this->save_->exec();
+        if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;event->ignore();return;}
+    }
     //p.exec();
     //cleanUp();
     event->accept();
@@ -446,7 +457,22 @@ if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
 
 void MainWindow::on_actionOpen_triggered()
 {
+    if(need_save_&&(!mte->document()->isEmpty())){
+    //this->save_=new saveDialog;
+        //this->save_->setModal(true);
+        this->save_->show();
+        this->save_->exec();
+        if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;return;}
+    }
+this->save_->is_cancel_button_clicked()=false;
+need_save_as_=false;
+
+
+
     QString open_file = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
+
+    if(!open_file.isEmpty()&& !open_file.isNull()) //"Cancel" in choose dialog case
+    {
 
 qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::tempPath();
 
@@ -460,6 +486,7 @@ qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::
         if(!file.open(QIODevice::ReadOnly))
             QMessageBox::information(0,"info",file.errorString());
         else{
+
 buttons_enabled(true);
             end_file=false;
             scroll_buf=0;
@@ -527,14 +554,15 @@ ui->search_button->setToolTip("<font style=\"background-color:yellow;\">Search f
 //mte->setStyleSheet("");
 
 format=mte->currentCharFormat();
-
-    }
+need_save_=false;
+play_it_safe_close_=false;
+        }
         qDebug() << "BUFFER SIZE AFTER OPNE FILE::" << buffer_.size();
         qDebug() << "END FILE AFTER OPEN ==::==" << (bool)end_file;
+    }
+
+
 }
-
-
-
 
 
 void MainWindow::search_slot(QString pattern,bool highlight,int color)
@@ -1098,7 +1126,7 @@ void MainWindow::on_actionNew_triggered()
 
                 //need_save_=true;
                 need_save_as_=true;
-
+play_it_safe_close_=false;
 
 }
 
@@ -1176,7 +1204,8 @@ void MainWindow::need_save()
 {
     need_save_=true;
     qDebug() << "YES::" << mte->document()->isEmpty();
-    if((!buttons_isEnabled_)&&(!mte->document()->isEmpty()))buttons_enabled(true);
+    if(((!buttons_isEnabled_)&&(!mte->document()->isEmpty()))){buttons_enabled(true);buttons_isEnabled_=true;}
+    if(buttons_isEnabled_)play_it_safe_close_=true;
     //mte->blockSignals(false);
 }
 
@@ -1229,7 +1258,7 @@ void MainWindow::on_actionSave_as_triggered()
 
     QString save_as_file = QFileDialog::getSaveFileName(this, "Save as", QDir::homePath());
 
-    if(!save_as_file.isEmpty()&& !save_as_file.isNull())
+    if(!save_as_file.isEmpty()&& !save_as_file.isNull()) //"Cancel" in choose dialog case
     {
 
     QFile file(save_as_file);
@@ -1254,7 +1283,7 @@ void MainWindow::on_actionSave_as_triggered()
 
         file_path_=QFileInfo(file).path();
         file_name_ = QFileInfo(file).fileName();
-        temp_file_path_ = file_path_;               //check?
+        temp_file_path_ = file_path_;
 
         qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_ <<
                     "SAVE AS TEMP FILE PATH AFTER==" << temp_file_path_;
