@@ -603,7 +603,7 @@ text_cursor_isSet_toEnd=false;
 
   buffer_.clear();
 
-  buffer_.append(stream.readAll());
+  buffer_.append(stream.readAll()/*.toLatin1()*/);
 
   file.close();
 
@@ -616,7 +616,7 @@ text_cursor_isSet_toEnd=false;
 
     std::string std_pat = pattern.toStdString();
     char const *pat_cstr = std_pat.c_str();
-
+qDebug() << str.data();
 
 
         if(!highlight){
@@ -884,7 +884,8 @@ void MainWindow::format_slot(const QTextCharFormat &f)
 
 void MainWindow::mouse_press_slot()
 {
-    //cursor_position = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+//    cursor_position = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
+    cursor_position = mte->cursorForPosition(mte->mapFromGlobal((mte->cursor().pos()))).position();
     ui->statusbar->showMessage(QString::number(cursor_position));
     mte->setCurrentCharFormat(format);
 }

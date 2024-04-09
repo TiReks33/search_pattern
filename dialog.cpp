@@ -11,7 +11,8 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-    ui->textEdit->setText("aRTおはよう1Up");
+    //ui->textEdit->setText("aRTおはよう1Up");
+    ui->textEdit->setText("");
 }
 
 Dialog::~Dialog()
