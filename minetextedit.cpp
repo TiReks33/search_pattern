@@ -3,11 +3,7 @@
 #include <QTextBrowser>
 
 MineTextEdit::MineTextEdit()
-    //:QTextEdit(parent)
-    //,ui(new Ui::MineTextEdit)
-{
-    //ui->setupUi(this);
-}
+{}
 
 
 

@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ProcessIsFinished(false)
     , end_text_cursor_pos_(0)
     , text_cursor_isSet_toEnd(false)
-    , file_size_limit_(24000000) //[24mb24.5]
+    , file_size_limit_(24000000) //(24-24.5mb]
     , need_save_(false)
     , need_save_as_(true)
 
@@ -80,47 +80,27 @@ MainWindow::MainWindow(QWidget *parent)
     , hints(new Hints)
 {
     ui->setupUi(this);
-   //mte->setDisabled(true);
-   //mte->blockSignals(true);
-    //setStyleSheet("QMainWindow {background-image:url(/home/alexander/Pictures/windowswallpaper.jpg);}");
-    //setStyleSheet("QMainWindow {background-color: rgb(195,216,246);}");
+
     setStyleSheet("QMainWindow {background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #55a3db, stop: 1 #dfecf6);}"
 "QToolBar::separator{ width:2px;background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd); }"
 "");
-    //setStyleSheet("QMainWindow {background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);}");
 
     ui->toolBar->setStyleSheet("border:none;background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #dfecf6, stop: 1 #55a3db);");
 
 mte->verticalScrollBar()->setStyleSheet("background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);");
+
     //"Search button"
-//       ui->search_button->setMinimumHeight(50);
-       //ui->search_button->setFixedHeight(50);
-//       ui->search_button->setMinimumWidth(50);
-       //ui->search_button->setFixedWidth(50);
        ui->search_button->setFixedSize(67,67);
         QRect rect(0,0,67,67);
        QRegion region(rect, QRegion::Ellipse);
        ui->search_button->setMask(region);
-ui->search_button->setStyleSheet("border: none;"
+        ui->search_button->setStyleSheet("border: none;"
             "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
-
-                                 "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #5598c9, stop: 1 #a9d5f5);"
+                        "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #5598c9, stop: 1 #a9d5f5);"
                                 );
 
-//1st widget (main editor window)
-       /*QWidget *centralWidget = new QWidget(this);
-    centralWidget->setFixedSize(660,660);
-    centralWidget->move(0,30);
 
-    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
-
-
-    layout->addWidget(mte,50);
-
-    mte->setReadOnly(false)*/;
-
-//2nd widget (func but)
-
+//widget for text screen and button
 QWidget *centralWidget1 = new QWidget(this);
 centralWidget1->move(0,30);
 //QGridLayout * layout1 = new QGridLayout(centralWidget1);
@@ -138,35 +118,16 @@ mte->setFont(QFont("DejaVu Sans Mono"));
 mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 
-
-//3d widget (for "search button")
-    /*QWidget *search_widget = new QWidget(this);
-    QGridLayout * layout3 = new QGridLayout(search_widget);
-
-    layout3->addWidget(ui->search_button);
-
-    search_widget->setFixedSize(175,175);
-    search_widget->move(576,196);
-    search_widget->show()*/;
-
-//    QPushButton *clc_button = new QPushButton(this);
-//    clc_button->setText("clear screen");
-//    clc_button->setFixedSize(100,50);
-//    clc_button->move(700,500);
-//    clc_button->show();
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=====SIGNALS=====%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
        connect(d_,&Dialog::search_signal2, this, &MainWindow::search_slot);
        connect(mte, &MineTextEdit::signal, this, &MainWindow::mte_slot);
-       //connect(clc_button, SIGNAL (released()),this, SLOT (clc_released()));
 
-       //mte->verticalScrollBar()->
 
        connect(mte->verticalScrollBar(),SIGNAL(sliderMoved(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
        connect(mte->verticalScrollBar(),SIGNAL(valueChanged(int)),this/*mte->verticalScrollBar()*/,SLOT(slider_slot(int)),Qt::QueuedConnection);
 
-       connect(mte,&MineTextEdit::currentCharFormatChanged,this,&MainWindow::format_slot);
+       //connect(mte,&MineTextEdit::currentCharFormatChanged,this,&MainWindow::format_slot);
 
        connect(mte,&MineTextEdit::mouse_press_signal,this,&MainWindow::mouse_press_slot);
 
@@ -180,7 +141,7 @@ mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
        connect(this,&MainWindow::long_text_add_signal, this, &MainWindow::long_text_add_slot,Qt::QueuedConnection);
        connect(this,SIGNAL(cursor_shape_signal(int)),this,SLOT(cursor_shape_slot(int)));
-       //connect(this,SIGNAL(single_shot_signal()),this,SLOT(single_shot_slot()), Qt::QueuedConnection);
+
 
        connect(this,SIGNAL(total_occur(size_t)),r_,SLOT(total_occur_slot(size_t)));
 
@@ -188,13 +149,6 @@ mte->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
        connect(save_,&saveDialog::save_signal, this, &MainWindow::on_actionSave_triggered);
 
-
-//this->mte->setUndoRedoEnabled(false);
-
-//mte->setEnabled(false);
-qDebug() << QDir::tempPath();
-
-//mte->blockSignals(false);
 }
 
 MainWindow::~MainWindow()
@@ -210,56 +164,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //QMessageBox p;
-    //p.warning(0,"123","123");
+
     if((need_save_&&(!mte->document()->isEmpty()))||play_it_safe_close_){
-    //this->save_=new saveDialog;
-        //this->save_->setModal(true);
+
         this->save_->show();
         this->save_->exec();
         if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;event->ignore();return;}
     }
-    //p.exec();
-    //cleanUp();
+
     event->accept();
 }
 
-size_t strlenpp(std::string const *str)
-{
-    const char * str_temp=str->c_str();
-    size_t t = 0;
-    for (; str_temp[t]!='\0';++t);
-    return t;
-}
-
-size_t strlenpp(std::string const str)
-{
-    const char * str_temp=str.c_str();
-    size_t t = 0;
-    for (; str_temp[t]!='\0';++t);
-    return t;
-}
-
-size_t strlenpp(std::wstring const str)
+// string length for const char*,const w-char[],std::string,std::wstring
+template <class T>
+size_t strlenpp(T str)
 {
     size_t t = 0;
-    for (; str[t]!='\0';++t);
+    for(; str[t]!='\0';++t);
     return t;
-}
-
-size_t strlenpp(const char *str)
-{
-    size_t t = 0;
-    for (; str[t]!='\0';++t);
-    return t;
-}
-
-
-size_t strlenpp(char *str)
- {
-     size_t t = 0;
-     for (; str[t]!='\0';++t);
-     return t;
 }
 
 
@@ -277,8 +199,7 @@ void MainWindow::buttons_enabled(bool on_off)
 
     ui->search_button->setStyleSheet("border: none;"
                 "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
-
-                                     "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd);"
+                            "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd);"
                                     );
 
     ui->search_button->setToolTip(
@@ -575,13 +496,11 @@ after=text.substr(start_pos);
 
 void MainWindow::on_search_button_clicked()
 {
-    //QString file_dir = QFileDialog::getOpenFileName(this, "Open a file", QDir::homePath());
-        //QFile file("/home/alexander/cpp/$temp1");
-if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
+    if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
     temp_subfolder_ = temp_file_path_ + "/";
     //temp_subfolder_ = temp_file_path_ + "/" + prog_name_;
 
-    // Checking if temp directory exist -- else create it!
+// Checking if temp directory exist -- else create it!
     QDir dir(temp_subfolder_);
     if (!dir.exists())
         dir.mkpath(".");
@@ -635,7 +554,7 @@ need_save_as_=false;
     if(!open_file.isEmpty()&& !open_file.isNull()) //"Cancel" in choose dialog case
     {
 
-qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::tempPath();
+//qDebug() << "QDir::temp() ::" << QDir::temp() << "QDir::tempPath() ::" << QDir::tempPath();
 
     QFile file(open_file);
     if(file.size()>file_size_limit_){
@@ -674,8 +593,6 @@ buttons_enabled(true);
 
             file.close();
 
-//end_file=true; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
 
 if(plain_fsize_<maxfullsize){
 
@@ -700,19 +617,7 @@ else {;}
 
         }
 
-/*ui->search_button->setEnabled(true);
-ui->search_button->setStyleSheet("background-color: blue;");
 
-//"<span style=\"background-color:"+color_+";\">"
-
-//                +QString::fromStdString(after)
-
-//                +"</span>";
-
-
-ui->search_button->setToolTip("<font style=\"background-color:yellow;\">Search function. Click to enter the search pattern.</font>")*/;
-
-//mte->setStyleSheet("");
 
 format=mte->currentCharFormat();
 need_save_=false;
@@ -729,8 +634,8 @@ play_it_safe_close_=false;
 void MainWindow::search_slot(QString pattern,bool highlight,int color)
 {
     //QTime t;
-    QElapsedTimer t;
-     t.start();
+//    QElapsedTimer t;
+//     t.start();
 
 size_t position_ = mte->verticalScrollBar()->value();
 
@@ -746,7 +651,7 @@ size_t position_ = mte->verticalScrollBar()->value();
               qDebug() << "ERROR READING FILE:" << file.fileName();
 
   }else{
-      //ui->search_button->setEnabled(false);
+
 end_file=false;
 
 scroll_buf=0;
@@ -755,9 +660,7 @@ buf_start=0;
 end_text_cursor_pos_=0;
 text_cursor_isSet_toEnd=false;
 
-      //on_search_clc_button_clicked();
 
-//            clear_check()=true;
 
   QTextStream stream(&file);
   plain_fsize_=file.size();
@@ -769,9 +672,6 @@ text_cursor_isSet_toEnd=false;
   file.close();
 
 
-
-
-    //char const *pat_cstr = std_pat.c_str();
 
   if(options->is_option_str()){
 
@@ -800,18 +700,12 @@ text_cursor_isSet_toEnd=false;
 
 
 
-//qDebug() << wstr.data();
-
-
-
-
 
         fsize_ = buffer_.size();
-qDebug() << "123456 FSIZE_::" << fsize_;
 
         if(fsize_<maxfullsize){
 
-            qDebug() << "SLIDER POSITION" << position_;
+            //qDebug() << "SLIDER POSITION" << position_;
 
 
             mte->clear();
@@ -821,15 +715,15 @@ qDebug() << "123456 FSIZE_::" << fsize_;
 
         mte->verticalScrollBar()->setSliderPosition(position_);
 
-         end_file=true;                                          //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+         end_file=true;
 
          set_cursor_slot(first_occurrence_);
 
         }else if(fsize_>=maxfullsize){
 
 
-            //is_split=true;
         mte->clear();
+
         //buffer for "split-scroll" viewing
              if(fsize_<2500000)                 { buf_size= 250000 ; }
         else if(fsize_>2500000&&fsize_<5500000) { buf_size= 500000 ; }
@@ -854,9 +748,11 @@ qDebug() << "123456 FSIZE_::" << fsize_;
 
              scroll_buf=(max_scroll*0.75);
 
-             qDebug() << "MAX SCROLL == " << max_scroll;
-             qDebug() << "CURRENT SCROLL == " << position_;
+//             qDebug() << "MAX SCROLL == " << max_scroll;
+//             qDebug() << "CURRENT SCROLL == " << position_;
+
 end_text_cursor_pos_=mte->textCursor().position();
+
              //if(position_<scroll_buf){ //{1}
              if(position_<max_scroll){ //{1}
 
@@ -864,14 +760,14 @@ end_text_cursor_pos_=mte->textCursor().position();
                  if(first_occurrence_<300000){ //{2}
                             if(first_occurrence_<buf_start){ //{3}
                                     //end_text_cursor_pos_=mte->textCursor().position();
-                            qDebug() << "PRE cursor position" << mte->textCursor().position();
+//                            qDebug() << "PRE cursor position" << mte->textCursor().position();
                      //emit set_cursor_signal(first_occurrence_);
                                 set_cursor_slot(first_occurrence_);
-                                qDebug() << "AFTER first_occurence" << first_occurrence_;
-                                qDebug() << "AFTER cursor position" << mte->textCursor().position();
-                                qDebug() << "AFTER cursor end" << QTextCursor::End;
+//                                qDebug() << "AFTER first_occurence" << first_occurrence_;
+//                                qDebug() << "AFTER cursor position" << mte->textCursor().position();
+//                                qDebug() << "AFTER cursor end" << QTextCursor::End;
                             } else { //{3}
-                                qDebug() << "CASE {3}";
+//                                qDebug() << "CASE {3}";
                                 //emit add_text_signal_2limit(first_occurrence_);
                                  add_text_slot_2limit(first_occurrence_);
                                 }
@@ -885,7 +781,7 @@ end_text_cursor_pos_=mte->textCursor().position();
 
 
                 } else { //{1}
-                    qDebug() << "CASE {1}";
+//                    qDebug() << "CASE {1}";
                      //emit add_text_signal(position_,max_scroll);
                             add_text_slot(position_,max_scroll);
                 //mte->verticalScrollBar()->setSliderPosition(position_);
@@ -896,21 +792,21 @@ end_text_cursor_pos_=mte->textCursor().position();
 
 
 
-    clear_check()=false;
+    //clear_check()=false;
 
     mte->setReadOnly(true);
 
 
     ui->statusbar->showMessage(QString::number(occurrences)+" matches found");
 
-    qDebug() << ("FILE SIZE IS ::"+QString::number(plain_fsize_)
-                               +"BUFFER AFTER SEARCH SIZE IS ::"+QString::number(fsize_));
-    qDebug() << "FORMAT AFTER OPEN ::" << format.background();
+//    qDebug() << ("FILE SIZE IS ::"+QString::number(plain_fsize_)
+//                               +"BUFFER AFTER SEARCH SIZE IS ::"+QString::number(fsize_));
+//    qDebug() << "FORMAT AFTER OPEN ::" << format.background();
 
   }
 //qDebug("Time elapsed: %d ms", t.elapsed());
-  qDebug() << "Time elapsed: " << t.elapsed() << " ms";
-  qDebug() << "END FILE AFTER SEARCH ==::==" << (bool)end_file;
+//  qDebug() << "Time elapsed: " << t.elapsed() << " ms";
+//  qDebug() << "END FILE AFTER SEARCH ==::==" << (bool)end_file;
 }
 
 
@@ -934,8 +830,8 @@ end_file=true;
 
 size_t scrollval = mte->verticalScrollBar()->value();
 
-QElapsedTimer t;
- t.start();
+//QElapsedTimer t;
+// t.start();
 
         QTextCursor cursor = mte->textCursor();
         cursor.setCharFormat(format);
@@ -983,9 +879,7 @@ mte->clear();
 
         mte->setReadOnly(false);
 
-        //ui->search_button->setEnabled(true);
-
-        qDebug() << "12345 Cursor current pos::==" << selection_start << "::" << selection_end;
+//        qDebug() << "12345 Cursor current pos::==" << selection_start << "::" << selection_end;
         if(selection_start<300000){
            cursor.setPosition(selection_start);
            cursor.setPosition(selection_end, QTextCursor::KeepAnchor);
@@ -995,7 +889,7 @@ mte->clear();
 
 
 
-qDebug() << "MTE time == " << t.elapsed();
+//qDebug() << "MTE time == " << t.elapsed();
 
 
     }
@@ -1010,12 +904,13 @@ void MainWindow::slider_slot(int)//(int v)
 
         size_t temp = mte->verticalScrollBar()->value();
 
-        ui->statusbar->showMessage(QString::number(temp));
+        ui->statusbar->showMessage("Slider position: "+QString::number(temp));
         if(end_file){ return;}
-        if (temp>=(scroll_buf)) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
+        if (temp>=(scroll_buf))
         {
         if(!text_cursor_isSet_toEnd){set_cursor_slot(end_text_cursor_pos_);text_cursor_isSet_toEnd=true;}
-            qDebug()<< "Scroll TEST";
+//            qDebug()<< "Scroll TEST";
 
             if((buf_start+buf_size)<=fsize_){
             QStringRef subbuf(&buffer_,buf_start,buf_size);
@@ -1028,9 +923,7 @@ void MainWindow::slider_slot(int)//(int v)
             buf_start+= buf_size;
 
             size_t max_scroll = mte->verticalScrollBar()->maximum();
-             scroll_buf=(max_scroll*0.75);
-
-            qDebug() << "SCROLL BUFFFFFFUUUUUU" << scroll_buf;
+             scroll_buf=(max_scroll*0.75);   
 
             } else if((buf_start+buf_size)>fsize_){
                 size_t buf_final_temp = fsize_-buf_start;
@@ -1041,8 +934,6 @@ void MainWindow::slider_slot(int)//(int v)
                                 +"</pre>"
                                 );
 
-                qDebug() << "buf_start" << buf_start << "buf_size" << buf_size << "fsize_" << fsize_ << "buf_final_temp" << buf_final_temp
-                         << "scroll_buf" << scroll_buf << "temp" << temp;
 
                 end_file=true;
                 scroll_buf=0;
@@ -1057,16 +948,17 @@ void MainWindow::slider_slot(int)//(int v)
 }
 
 
-void MainWindow::format_slot(const QTextCharFormat &f)
-{
-    qDebug() << "Current format changed: " << f.background();
-}
+//void MainWindow::format_slot(const QTextCharFormat &f)
+//{
+//    qDebug() << "Current format changed: " << f.background();
+//}
 
 void MainWindow::mouse_press_slot()
 {
 //    cursor_position = mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position();
     cursor_position = mte->cursorForPosition(mte->mapFromGlobal((mte->cursor().pos()))).position();
-    ui->statusbar->showMessage(QString::number(cursor_position));
+        //ui->statusbar->setStyleSheet("color:red;");
+    ui->statusbar->showMessage("Cursor Position: "+QString::number(cursor_position));
     mte->setCurrentCharFormat(format);
 }
 
@@ -1128,8 +1020,7 @@ if(!text_cursor_isSet_toEnd){set_cursor_slot(end_text_cursor_pos_);text_cursor_i
 
 void MainWindow::add_text_slot_2limit(size_t limit_pos) //!!
 {
- //if(end_file)return;
-    //if(!text_cursor_isSet_toEnd){set_cursor_slot(end_text_cursor_pos_);text_cursor_isSet_toEnd=true;}
+
     do{
 if(end_file)break;
 
@@ -1189,7 +1080,6 @@ void MainWindow::set_position_slot(size_t scrollval)
 void MainWindow::set_cursor_slot(int positio)
 {
     QTextCursor cursor = mte->textCursor();
-    //cursor.setPosition(mte->cursorForPosition(mte->mapFromGlobal(QCursor::pos())).position());
     cursor.setPosition(positio);
     mte->setTextCursor(cursor);
     qDebug() << "SIGNAL CURSOR EMITED";
@@ -1197,7 +1087,6 @@ void MainWindow::set_cursor_slot(int positio)
 
 void MainWindow::long_text_add_slot()
 {
-//    if(end_file)return;
 
     do{
 
@@ -1268,29 +1157,7 @@ void MainWindow::on_actionNew_triggered()
         if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;return;}
     }
 
-//    QFile file(QDir::tempPath()+"/.$unsaved_file");
 
-//        if(!file.open(QIODevice::ReadOnly))
-//            QMessageBox::information(0,"info",file.errorString());
-//        else{
-//            buttons_enabled(true);
-
-//            end_file=true;
-//            scroll_buf=0;
-//            buf_start=0;
-
-//            end_text_cursor_pos_=0;
-//            text_cursor_isSet_toEnd=true;
-
-//            mte->clear();
-//            QTextStream in(&file);
-
-//            file_path_=QFileInfo(file).path();
-//            file_name_ = QFileInfo(file).fileName();
-//            temp_file_path_ = file_path_;
-//            file.close();
-
-//        }
 
                 this->save_->is_cancel_button_clicked()=false;
                 buttons_enabled(true);
@@ -1384,7 +1251,7 @@ success="<img src='"+success+"' height='32' width='32'>";
 void MainWindow::need_save()
 {
     need_save_=true;
-    qDebug() << "YES::" << mte->document()->isEmpty();
+
     if(((!buttons_isEnabled_)&&(!mte->document()->isEmpty()))){buttons_enabled(true);buttons_isEnabled_=true;}
     if(buttons_isEnabled_)play_it_safe_close_=true;
     //mte->blockSignals(false);
@@ -1466,8 +1333,8 @@ void MainWindow::on_actionSave_as_triggered()
         file_name_ = QFileInfo(file).fileName();
         temp_file_path_ = file_path_;
 
-        qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_ <<
-                    "SAVE AS TEMP FILE PATH AFTER==" << temp_file_path_;
+//        qDebug() << "SAVE AS PATH AFTER==" << file_path_ << "::" << "SAVE AS NAME AFTER" << file_name_ <<
+//                    "SAVE AS TEMP FILE PATH AFTER==" << temp_file_path_;
 
         file.close();
 

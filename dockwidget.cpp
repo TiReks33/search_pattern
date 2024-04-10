@@ -8,7 +8,7 @@ DockWidget::DockWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->radioButton_2->setChecked(true);
-    qDebug() << ui->radioButton->isChecked() <<"::"<< ui->radioButton_2->isChecked();
+    //qDebug() << ui->radioButton->isChecked() <<"::"<< ui->radioButton_2->isChecked();
 }
 
 DockWidget::~DockWidget()

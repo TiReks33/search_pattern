@@ -58,8 +58,8 @@
     </property>
     <property name="toolTip">
      <string>&lt;font style=color:gray;&gt;Search function.
-Disabled until some file
-will be opened.&lt;/font&gt;</string>
+Disabled until some text
+will be entered or some file opened/created.&lt;/font&gt;</string>
     </property>
     <property name="text">
      <string>🔍</string>

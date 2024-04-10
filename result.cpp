@@ -8,7 +8,6 @@ Result::Result(QWidget *parent) :
     ui->setupUi(this);
     ui->head_label->setText("Pattern exist in next literal positions(from zero):\n");
 
-    //connect()
 }
 
 Result::~Result()
@@ -23,7 +22,6 @@ void Result::search_results(QString& text)
 
 void Result::search_results(QString& text, char /*color*/)
 {
-    //"<div><font color=\"red\">"+QString(result)+"</font></div>";
     ui->result_text->setHtml("<div><font color=\"red\">"+text+"</font></div>");
 }
 

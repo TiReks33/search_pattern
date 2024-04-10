@@ -22,51 +22,46 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // close-event override for save purpose after closing
     void closeEvent(QCloseEvent *event);
 
+    // save/save-as enable after some actions
     void buttons_enabled(bool on_off=true);
 
-
+    // search function for 1-byte encoding
     void search_highlight(const std::string& text,const std::string& pattern,int color);
 
+    // search function for 1+2-more byte encoding (w_char)
     void search_highlight_w(const std::wstring& text,const std::wstring& pattern,int color);
 
+    // search function for 1-byte encoding (with result window)
     void search_highlight_occurrences(const std::string& text,const std::string& pattern,int color);
 
+    // search function for 1+2-more byte encoding (with result window) (w_char)
     void search_highlight_occurrences_w(const std::wstring& text,const std::wstring& pattern,int color);
 
+    //bool & clear_check(){static bool clear = false;return clear;}
 
-
-
-    bool & clear_check(){static bool clear = false;return clear;}
-
-    bool & select_check(){static bool select = false;return select;}
+    //bool & select_check(){static bool select = false;return select;}
 
 
 private slots:
+
+    // function saves current file changes to the
+    // temporary file before search
     void on_search_button_clicked();
 
+    // opening new file and all the addition stuffs
+    // (flags etc.)
     void on_actionOpen_triggered();
 
-//    void on_reset_text_clicked();
-
     void on_actionExit_triggered();
-
-//    void clc_released();
-
-
-//    void on_bigRead_button_clicked();
-
-//    void on_search_clc_button_clicked();
-
-//    void on_pushButton_clicked();
-
-//   void on_pushButton_2_clicked();
 
     void on_actionStart_search_triggered();
 
     void on_actionStart_search_2_triggered();
 
+    // create new file
     void on_actionNew_triggered();
 
     void on_actionCut_triggered();
@@ -81,10 +76,13 @@ private slots:
 
     void on_actionAbout_Qt_triggered();
 
+    // info window
     void on_actionAbout_Search_pattern_triggered();
 
+    // save file
     void on_actionSave_triggered();
 
+    // save as
     void on_actionSave_as_triggered();
 
     void on_actionOptions_triggered();
@@ -95,43 +93,48 @@ private slots:
 
 public slots:
 
+    // handle signal from the 'dialog' window
     void search_slot(QString str="",bool highlight=false,int color=0);
 
+    // this slot handle mouse clicking on the screen after search highlighting
+    // (revert plain text after setting hmtl color tags with entries of pattern)
     void mte_slot();
 
+    // mechanism that loads html-tagged text with search results part-by-part
+    // (for memory optimization of 'Rich' text in qTextEdit)
     void slider_slot(int);
 
-    void format_slot(const QTextCharFormat &f);
+    //void format_slot(const QTextCharFormat &f);
 
+    // overriding slot for handling left mouse button-pressed scenario
     void mouse_press_slot();
 
+    // function scrolls html-tagged text to the current QTextEdit->Slider position after search complete
     void add_text_slot(size_t,size_t);
 
+    // function may scroll html-tagged text to the current QTextEdit->textSlider position after search
     void add_text_slot_2limit(size_t);
 
+    // func sets scrollbar to the needed position
     void set_position_slot(size_t);
 
+    // func sets cursor to the needed position
     void set_cursor_slot(int);
 
-    //void set_cursor_slot(size_t);
-
-    //void set_cursor_slot(QTextCursor);
-
-    //void slider_slot(int,int);
-
+    // function for open file (fast insert for large files without lagging; uses fast 'subbuf' method)
     void long_text_add_slot();
 
+    // cursor icon change
     void cursor_shape_slot(int);
 
-    //void single_shot_slot();
-
+    // after writing some text in window, this slot was handled by 'textEdit->textChanged() SIGNAL
     void need_save();
 
 signals:
 
     void add_text_signal(size_t,size_t);
 
-    void add_text_signal_2limit(size_t); //new
+    void add_text_signal_2limit(size_t);
 
     void set_position_signal(size_t);
 
@@ -139,13 +142,11 @@ signals:
 
     void set_cursor_signal(size_t);
 
-    //void set_cursor_signal(QTextCursor);
 
     void long_text_add_signal();
 
     void cursor_shape_signal(int);
 
-    //void single_shot_signal();
 
     void total_occur(size_t);
 
@@ -169,7 +170,6 @@ private:
     QString temp_subfolder_;
     QString full_tmp_f_path_;
 
-    //QString search_;
 
     // text file partial read logic
     // (by slider (vertical scroll-bar)
@@ -180,7 +180,7 @@ private:
     size_t scroll_buf;
     size_t buf_start;
     bool end_file;
-    //bool is_split;
+
     QTextCharFormat format;
 
     bool ProcessIsFinished;
