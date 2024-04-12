@@ -39,5 +39,7 @@
         <file>rec/icons/6.png</file>
         <file>rec/icons/7.png</file>
         <file>rec/icons/5.png</file>
+        <file>rec/icons/msg_error-1.png</file>
+        <file>rec/icons/printer-0.png</file>
     </qresource>
 </RCC>

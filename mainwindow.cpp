@@ -22,6 +22,10 @@
 #include <QTimer>
 #include <QThread>
 #include <QDockWidget>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QPageSetupDialog>
+#include <QPrintPreviewDialog>
 
 #include <iostream>
 #include <stdlib.h>
@@ -45,13 +49,13 @@ MainWindow::MainWindow(QWidget *parent)
     , buffer_("")
     , in_()
 
-    , prog_name_("Search_pattern")
+    , prog_name_("search_pattern")
     , file_path_(QDir::homePath())
-    , file_name_("")
+    , file_name_(prog_name_)
     , temp_file_path_(QDir::tempPath())
     , temp_file_prefix_("$temp_")
     , temp_subfolder_()
-    , full_tmp_f_path_(temp_file_path_)
+    , full_tmp_f_path_()
 
     //// text file partial read logic
     , fsize_(0)
@@ -170,7 +174,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
         this->save_->show();
         this->save_->exec();
         if(save_->is_cancel_button_clicked()){this->save_->is_cancel_button_clicked()=false;event->ignore();return;}
-    }
+        }
+
+    QFile file (full_tmp_f_path_);
+    bool fdelete_ = file.remove();
+    if(!fdelete_){if(!full_tmp_f_path_.isEmpty())QMessageBox::warning(0,"Error deleting temp file",
+                        QString("Error deleting temporary file %1. Sorry, you'll have to delete it by yourself.")
+                        .arg(full_tmp_f_path_));}
 
     event->accept();
 }
@@ -193,10 +203,12 @@ void MainWindow::buttons_enabled(bool on_off)
     ui->menuSearch->setEnabled(on_off);
     ui->actionSave->setEnabled(on_off);
     ui->actionSave_as->setEnabled(on_off);
+    ui->actionClose_all->setEnabled(on_off);
+    ui->actionPrint->setEnabled(on_off);
 
     //"Search" button-->
-    ui->search_button->setEnabled(true);
-
+    ui->search_button->setEnabled(on_off);
+    if(on_off){
     ui->search_button->setStyleSheet("border: none;"
                 "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
                             "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #487ea6, stop: 1 #63a1cd);"
@@ -207,9 +219,19 @@ void MainWindow::buttons_enabled(bool on_off)
                                   "Search function.\nClick to enter the search pattern."
                                   "</font>"
                                   );
-    //<--"Search" button
+    }else{
+        ui->search_button->setStyleSheet("border: none;"
+            "background-color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #e7ebef, stop: 1 #cde3f2);"
+                        "color: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,    stop: 0 #5598c9, stop: 1 #a9d5f5);"
+                                );
+        ui->search_button->setToolTip(
+                    "<font style=color:gray;>Search function.\nDisabled until"
+                    " some text\nwill be entered or some file opened.</font>"
+                    );
 
-    buttons_isEnabled_=true;
+    }
+    //<--"Search" button
+    buttons_isEnabled_=on_off;
 }
 
 
@@ -497,7 +519,7 @@ after=text.substr(start_pos);
 void MainWindow::on_search_button_clicked()
 {
     if(mte->isReadOnly()){mouse_press_slot();mte->signal();}
-    temp_subfolder_ = temp_file_path_ + "/";
+    temp_subfolder_ = temp_file_path_ + "/";                // 'temp_file_path' -- '/tmp' by default;; or user defined in 'open file' dialog
     //temp_subfolder_ = temp_file_path_ + "/" + prog_name_;
 
 // Checking if temp directory exist -- else create it!
@@ -507,7 +529,7 @@ void MainWindow::on_search_button_clicked()
 
           full_tmp_f_path_ = temp_subfolder_ + '.' + temp_file_prefix_ + file_name_;
           QFile file(full_tmp_f_path_);
-
+qDebug() << full_tmp_f_path_;
         if(!file.open(QIODevice::WriteOnly)){
 
             QMessageBox p;
@@ -537,6 +559,7 @@ void MainWindow::on_search_button_clicked()
 
 void MainWindow::on_actionOpen_triggered()
 {
+    if(mte->isReadOnly()){mouse_press_slot();mte_slot();}
     if(need_save_&&(!mte->document()->isEmpty())){
     //this->save_=new saveDialog;
         //this->save_->setModal(true);
@@ -583,7 +606,7 @@ buttons_enabled(true);
             file_name_ = QFileInfo(file).fileName();
             temp_file_path_ = file_path_;
 
-            ui->statusbar->showMessage("File path: "+file_path_+' '+"File Size: "+QString::number(file.size()));
+            ui->statusbar->showMessage("File path: "+file_path_+' '+":: File Size: "+QString::number(file.size())+" bytes");
 
             buffer_.clear();
 
@@ -1149,6 +1172,7 @@ void MainWindow::on_actionStart_search_2_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
+    if(mte->isReadOnly()){mouse_press_slot();mte_slot();}
     if(need_save_&&(!mte->document()->isEmpty())){
     //this->save_=new saveDialog;
         //this->save_->setModal(true);
@@ -1160,7 +1184,9 @@ void MainWindow::on_actionNew_triggered()
 
 
                 this->save_->is_cancel_button_clicked()=false;
-                buttons_enabled(true);
+//                buttons_enabled(true);
+                buttons_enabled(false);
+                buttons_isEnabled_=false;
 
                 end_file=true;
                 scroll_buf=0;
@@ -1257,8 +1283,47 @@ void MainWindow::need_save()
     //mte->blockSignals(false);
 }
 
+void MainWindow::printer_slot(QPrinter* printer)
+{
+
+cursor_shape_slot(2); // wait mouse cursor
+QApplication::processEvents();
+    ui->statusbar->showMessage("Printing proceed, please wait.::⏳::");
+    QApplication::processEvents();
+    qDebug()<< printer->pageLayout();
+    //printer->setFullPage(true);
+
+    qDebug() << "0::" << printer->pageLayout().margins();
+
+    printer->setPageMargins(printer->pageLayout().margins());
+
+
+QSizeF paperSize;
+paperSize.setWidth(printer->width());
+paperSize.setHeight(printer->height());
+qDebug()<< paperSize.toSize();
+
+QSizeF pre_size = mte->document()->pageSize();
+
+
+mte->document()->setPageSize(paperSize); // the document needs a valid PageSize
+
+
+mte->print(printer);
+
+
+mte->document()->setPageSize(pre_size);
+
+//QMS.close();
+cursor_shape_slot(0); // ready mouse cursor
+ui->statusbar->showMessage("Printing complete!::✓::");
+}
+
+
+
 void MainWindow::on_actionSave_triggered()
 {
+    if(mte->isReadOnly()){mouse_press_slot();mte_slot();}
     if(need_save_as_){
 
         on_actionSave_as_triggered();
@@ -1303,6 +1368,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionSave_as_triggered()
 {
+    if(mte->isReadOnly()){mouse_press_slot();mte_slot();}
 
     QString save_as_file = QFileDialog::getSaveFileName(this, "Save as", QDir::homePath());
 
@@ -1348,7 +1414,8 @@ void MainWindow::on_actionSave_as_triggered()
 
 void MainWindow::on_actionOptions_triggered()
 {
-    //DockWidget * options = new DockWidget;
+    //DockWidget* options = new DockWidget;
+    options->setWindowModality(Qt::ApplicationModal);
     options->show();
 }
 
@@ -1360,4 +1427,35 @@ void MainWindow::on_actionOptions_2_triggered()
 void MainWindow::on_actionHints_tips_triggered()
 {
     hints->show();
+}
+
+void MainWindow::on_actionClose_all_triggered()
+{
+    on_actionNew_triggered();
+}
+
+void MainWindow::on_actionPrint_triggered()
+{
+    if(plain_fsize_>=maxfullsize){
+    //case{0} -- if Plain text for printing is too large
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this,"Large file printing",QString("Size of current text file "
+            "is %1 kilobytes. Do you want to print such large file? This process may take time.")
+            .arg(QString::number(static_cast<int>(plain_fsize_/1000))),QMessageBox::Ok|QMessageBox::Cancel);
+
+    if(reply == QMessageBox::Cancel)return;
+    }
+
+    // case{1} -- if html-tagged text (after search highlighting) is not fully loaded on a textEdit screen
+    if(mte->isReadOnly()){if(fsize_>=maxfullsize){mouse_press_slot();mte_slot();}}
+    QPrinter printer;
+    printer.setPrinterName("some printer");
+    QPrintDialog dialog(&printer,this);
+    qDebug()<<dialog.printer()->pageLayout();
+    qDebug()<<dialog.contentsMargins().left();
+    connect(&dialog,SIGNAL(accepted(QPrinter*)),this,SLOT(printer_slot(QPrinter*)));
+    if(dialog.exec()==QDialog::Rejected){
+        return;
+        }
+
 }

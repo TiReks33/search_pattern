@@ -9,6 +9,7 @@
 #include <savedialog.h>
 #include "dockwidget.h"
 #include "hints.h"
+#include <QPrinter>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -91,6 +92,10 @@ private slots:
 
     void on_actionHints_tips_triggered();
 
+    void on_actionClose_all_triggered();
+
+    void on_actionPrint_triggered();
+
 public slots:
 
     // handle signal from the 'dialog' window
@@ -130,6 +135,9 @@ public slots:
     // after writing some text in window, this slot was handled by 'textEdit->textChanged() SIGNAL
     void need_save();
 
+    // Prints text with layout(page size,orientation etc.) from 'QPrinter*'
+    void printer_slot(QPrinter*);
+
 signals:
 
     void add_text_signal(size_t,size_t);
@@ -165,10 +173,10 @@ private:
     QString prog_name_;
     QString file_path_;
     QString file_name_;
-    QString temp_file_path_;
+    QString temp_file_path_; // temp file will created after calling 'on_search_button_clicked()' slot
     QString temp_file_prefix_;
     QString temp_subfolder_;
-    QString full_tmp_f_path_;
+    QString full_tmp_f_path_; // absolute fpath with filename (empty by default until file created-saved/opened)
 
 
     // text file partial read logic
